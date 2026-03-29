@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function LandingScreen() {
     const router = useRouter();
     const { setUser } = useAppContext();
-    const { signIn } = useGoogleAuth();
+    const { signIn, signInForSignUp } = useGoogleAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -39,8 +39,24 @@ export default function LandingScreen() {
         }
     };
 
-    const signUpPressed = () => {
-        router.push("/(auth)/sign-up");
+    const signUpPressed = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const { firstName, lastName, email } = await signInForSignUp();
+            router.push({
+                pathname: "/(auth)/sign-up",
+                params: { firstName, lastName, email },
+            });
+        } catch (err: any) {
+            if (err?.code !== statusCodes.SIGN_IN_CANCELLED) {
+                const message =
+                    err instanceof Error ? err.message : "Authentication failed";
+                setError(message);
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

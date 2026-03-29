@@ -2,14 +2,31 @@ import { TextInputField } from "@/components/text-input-field";
 import { ThemedText } from "@/components/themed-text";
 import { globalStyles } from "@/constants/global-styles";
 import { TextVariants } from "@/constants/typography";
-import { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { Button, Surface } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
-    const [fName, setFName] = useState("");
-    const [lName, setLName] = useState("");
-    const [email, setEmail] = useState("");
+    const {
+        firstName,
+        lastName,
+        email: emailParam,
+    } = useLocalSearchParams<{
+        firstName: string;
+        lastName: string;
+        email: string;
+    }>();
+
+    const [fName, setFName] = useState(firstName ?? "");
+    const [lName, setLName] = useState(lastName ?? "");
+    const [email, setEmail] = useState(emailParam ?? "");
+
+    useEffect(() => {
+        if (firstName) setFName(firstName);
+        if (lastName) setLName(lastName);
+        if (emailParam) setEmail(emailParam);
+    }, [firstName, lastName, emailParam]);
     const [phone, setPhone] = useState("");
     const [rawPhone, setRawPhone] = useState("");
 
@@ -70,6 +87,11 @@ export default function SignUpScreen() {
                     style={globalStyles.landingPageButtons}
                     mode="contained"
                     onPress={() => console.log("Create Account Pressed")}
+                    disabled={
+                        email && fName && lName && rawPhone.length === 10
+                            ? false
+                            : true
+                    }
                 >
                     Create Account
                 </Button>
