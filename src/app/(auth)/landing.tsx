@@ -29,7 +29,9 @@ export default function LandingScreen() {
                 // user cancelled, do nothing
             } else {
                 const message =
-                    err instanceof Error ? err.message : "Authentication failed";
+                    err instanceof Error
+                        ? err.message
+                        : "Authentication failed";
                 setError(message);
             }
         } finally {

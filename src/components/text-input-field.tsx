@@ -1,7 +1,13 @@
 import { TextInput, TextInputProps } from "react-native-paper";
 
-export type InputFieldProps = TextInputProps & {text:string; setText: (text: string) => void; isPassword?: boolean; showPassword?: boolean; setShowPassword?: (show: boolean) => void; showEyeIcon?: boolean};
-
+export type InputFieldProps = TextInputProps & {
+    text: string;
+    setText: (text: string) => void;
+    isPassword?: boolean;
+    showPassword?: boolean;
+    setShowPassword?: (show: boolean) => void;
+    showEyeIcon?: boolean;
+};
 
 export function TextInputField({
     label,
@@ -13,6 +19,7 @@ export function TextInputField({
     setShowPassword,
     showEyeIcon,
     autoCapitalize,
+    ...rest
 }: InputFieldProps) {
     let additionalProps = {};
     if (isPassword) {
@@ -56,6 +63,7 @@ export function TextInputField({
                 paddingLeft: 15,
             }}
             {...additionalProps}
+            {...rest}
         />
     );
-};
+}
