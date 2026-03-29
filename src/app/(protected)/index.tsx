@@ -15,8 +15,11 @@ export default function HomeScreen() {
     };
 
     return (
-        <Surface style={globalStyles.container} elevation={0}>
-            <ThemedText variant={TextVariants.heading_md}>
+        <Surface
+            style={[globalStyles.container, { flexDirection: "column" }]}
+            elevation={0}
+        >
+            <ThemedText variant={TextVariants.subtitle_md}>
                 Welcome, {user?.fullName}
             </ThemedText>
             <ThemedText variant={TextVariants.label_sm}>

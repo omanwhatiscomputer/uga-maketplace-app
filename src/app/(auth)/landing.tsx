@@ -3,48 +3,42 @@ import { ThemedText } from "@/components/themed-text";
 import { globalStyles } from "@/constants/global-styles";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
-import { useGoogleAuth } from "@/hooks/use-google-auth";
+import { statusCodes, useGoogleAuth } from "@/hooks/use-google-auth";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, Button, Icon, Surface } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LandingScreen() {
     const router = useRouter();
     const { setUser } = useAppContext();
-    const { request, response, promptAsync } = useGoogleAuth();
+    const { signIn } = useGoogleAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (response?.type === "success") {
-            const idToken = response.params.id_token;
-            handleBackendAuth(idToken);
-        }
-    }, [response]);
-
-    const handleBackendAuth = async (idToken: string) => {
+    const signInPressed = async () => {
         setLoading(true);
         setError(null);
         try {
+            const idToken = await signIn();
             const user = await googleSignIn(idToken);
             setUser(user);
             router.replace("/(protected)");
-        } catch (err) {
-            const message =
-                err instanceof Error ? err.message : "Authentication failed";
-            setError(message);
+        } catch (err: any) {
+            if (err?.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled, do nothing
+            } else {
+                const message =
+                    err instanceof Error ? err.message : "Authentication failed";
+                setError(message);
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    const signInPressed = async () => {
-        await promptAsync();
-    };
-
     const signUpPressed = () => {
-        router.push("./sign-up");
+        router.push("/(auth)/sign-up");
     };
 
     return (
@@ -75,7 +69,6 @@ export default function LandingScreen() {
                             style={globalStyles.landingPageButtons}
                             icon="login"
                             mode="contained"
-                            disabled={!request}
                             onPress={signInPressed}
                         >
                             Sign In
