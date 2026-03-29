@@ -6,7 +6,13 @@ import { useAppContext } from "@/context/app-context";
 import { statusCodes, useGoogleAuth } from "@/hooks/use-google-auth";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Button, Icon, Surface } from "react-native-paper";
+import {
+    ActivityIndicator,
+    Button,
+    Icon,
+    Snackbar,
+    Surface,
+} from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LandingScreen() {
@@ -51,7 +57,9 @@ export default function LandingScreen() {
         } catch (err: any) {
             if (err?.code !== statusCodes.SIGN_IN_CANCELLED) {
                 const message =
-                    err instanceof Error ? err.message : "Authentication failed";
+                    err instanceof Error
+                        ? err.message
+                        : "Authentication failed";
                 setError(message);
             }
         } finally {
@@ -70,14 +78,12 @@ export default function LandingScreen() {
                     Marketplace
                 </ThemedText>
 
-                {error && (
-                    <ThemedText
-                        variant={TextVariants.label_sm}
-                        style={{ color: "red", paddingBottom: 8 }}
-                    >
-                        {error}
-                    </ThemedText>
-                )}
+                <Snackbar
+                    visible={!!error}
+                    onDismiss={() => setError(null)}
+                >
+                    {error}
+                </Snackbar>
 
                 {loading ? (
                     <ActivityIndicator animating size="large" />
