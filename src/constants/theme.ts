@@ -50,7 +50,7 @@ const customLightColors = {
 
 const customDarkColors = {
     primary: "rgb(186 12 47)",
-    onPrimary: "rgb(122, 12, 12)",
+    onPrimary: "rgb(255, 255, 255)",
     primaryContainer: "rgb(146, 43, 52)",
     onPrimaryContainer: "rgb(241,206,213)",
     secondary: "rgb(218, 193, 193)",

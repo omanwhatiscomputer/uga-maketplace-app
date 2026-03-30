@@ -2,14 +2,17 @@ import { ThemedText } from "@/components/themed-text";
 import { globalStyles } from "@/constants/global-styles";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
+import { useGoogleAuth } from "@/hooks/use-google-auth";
 import { useRouter } from "expo-router";
 import { Button, Surface } from "react-native-paper";
 
 export default function HomeScreen() {
     const { user, setUser } = useAppContext();
+    const { signOut: googleSignOut } = useGoogleAuth();
     const router = useRouter();
 
-    const signOut = () => {
+    const signOut = async () => {
+        await googleSignOut();
         setUser(null);
         router.replace("/(auth)/landing");
     };

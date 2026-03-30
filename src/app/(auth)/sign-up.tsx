@@ -2,12 +2,19 @@ import { TextInputField } from "@/components/text-input-field";
 import { ThemedText } from "@/components/themed-text";
 import { globalStyles } from "@/constants/global-styles";
 import { TextVariants } from "@/constants/typography";
-import { useLocalSearchParams } from "expo-router";
+import { useAppTheme } from "@/hooks/use-app-theme";
+import { useGoogleAuth } from "@/hooks/use-google-auth";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Button, Surface } from "react-native-paper";
+import { Button, IconButton, Surface } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
+    const {
+        colors: { primary },
+    } = useAppTheme();
+    const { signOut } = useGoogleAuth();
+
     const {
         firstName,
         lastName,
@@ -27,6 +34,7 @@ export default function SignUpScreen() {
         if (lastName) setLName(lastName);
         if (emailParam) setEmail(emailParam);
     }, [firstName, lastName, emailParam]);
+
     const [phone, setPhone] = useState("");
     const [rawPhone, setRawPhone] = useState("");
 
@@ -50,9 +58,27 @@ export default function SignUpScreen() {
     return (
         <Surface style={[globalStyles.container]} elevation={0}>
             <SafeAreaView style={globalStyles.safeAreaExtra}>
-                <ThemedText variant={TextVariants.subtitle_md}>
-                    Welcome to Sign up Page!
-                </ThemedText>
+                <Surface
+                    style={{
+                        width: "100%",
+                        flexDirection: "row",
+                        alignItems: "center",
+                    }}
+                    elevation={0}
+                >
+                    <IconButton
+                        icon="chevron-left"
+                        iconColor={primary}
+                        size={50}
+                        onPress={async () => {
+                            await signOut();
+                            router.back();
+                        }}
+                    />
+                    <ThemedText variant={TextVariants.subtitle_lg}>
+                        Join the community!
+                    </ThemedText>
+                </Surface>
                 <TextInputField
                     label="Email"
                     placeholder="Enter your email"
