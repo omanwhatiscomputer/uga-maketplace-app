@@ -10,7 +10,7 @@ type GoogleSignInResponse = {
 
 export async function googleSignIn(idToken: string): Promise<AppUser> {
     const response = await apiClient.post<GoogleSignInResponse>(
-        "/auth/google-signin",
+        "/auth/google-signup",
         null,
         {
             headers: {

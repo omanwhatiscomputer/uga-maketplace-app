@@ -87,7 +87,13 @@ export default function LandingScreen() {
     };
 
     return (
-        <Surface style={[globalStyles.container]} elevation={0}>
+        <Surface
+            style={[
+                globalStyles.container,
+                { justifyContent: "space-between" },
+            ]}
+            elevation={0}
+        >
             <SafeAreaView style={globalStyles.safeAreaExtra}>
                 <Icon source="storefront" size={128} />
                 <ThemedText
@@ -129,12 +135,14 @@ export default function LandingScreen() {
                 visible={!!error}
                 onDismiss={() => setError(null)}
                 style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
+                    // position: "absolute",
+                    // bottom: 0,
+                    // left: 0,
+                    // right: 0,
                     borderRadius: 36,
                     backgroundColor: colors.errorContainer,
+                    width: "90%",
+                    alignSelf: "center",
                 }}
                 theme={{ colors: { inverseSurface: colors.onErrorContainer } }}
                 action={{
