@@ -1,10 +1,15 @@
 import React, { createContext, useContext, useState } from "react";
 
-type AppUser = {
-    googleId: string;
+type UserDTO = {
+    id: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    fullName: string;
+    mobileNumber: string;
+    dateJoined: string;
 };
+
+type AppUser = UserDTO & { token: string };
 
 type AppContextType = {
     user: AppUser | null;
@@ -42,4 +47,4 @@ export function useAppContext() {
     return context;
 }
 
-export type { AppUser };
+export type { AppUser, UserDTO };

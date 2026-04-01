@@ -1,10 +1,13 @@
-import { googleSignIn } from "@/api/endpoints/auth";
+import { setAuthToken } from "@/api/client";
+import { signInWithGoogle, verifyGoogleSignUp } from "@/api/endpoints/auth";
 import { ThemedText } from "@/components/themed-text";
 import { globalStyles } from "@/constants/global-styles";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { statusCodes, useGoogleAuth } from "@/hooks/use-google-auth";
+import { saveAuthData } from "@/utils/auth-storage";
+import { setPendingIdToken } from "@/utils/temp-auth-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -20,7 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function LandingScreen() {
     const router = useRouter();
     const { setUser } = useAppContext();
-    const { signIn, signInForSignUp, signOut } = useGoogleAuth();
+    const { signIn, signOut } = useGoogleAuth();
     const { colors } = useAppTheme();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -31,26 +34,43 @@ export default function LandingScreen() {
         setLoading(true);
         setError(null);
         try {
-            const { idToken, email } = await signIn();
-            if (!isUGAEmail(email)) {
+            const profile = await signIn();
+
+            if (!isUGAEmail(profile.email)) {
                 await signOut();
-                setError(
-                    "Access restricted to UGA email addresses (@uga.edu).",
-                );
+                setError("Access restricted to UGA email addresses (@uga.edu).");
                 return;
             }
-            const user = await googleSignIn(idToken);
-            setUser(user);
-            router.replace("/(protected)/(tabs)");
+
+            try {
+                const user = await signInWithGoogle(profile.idToken);
+                setAuthToken(user.token);
+                await saveAuthData(user.token, user.id);
+                setUser(user);
+                router.replace("/(protected)/(tabs)");
+            } catch (apiErr: any) {
+                // 404 = no account yet → auto-redirect to sign-up
+                if (apiErr?.response?.status === 404) {
+                    setPendingIdToken(profile.idToken);
+                    router.push({
+                        pathname: "/(auth)/sign-up",
+                        params: {
+                            firstName: profile.firstName,
+                            lastName: profile.lastName,
+                            email: profile.email,
+                        },
+                    });
+                } else {
+                    throw apiErr;
+                }
+            }
         } catch (err: any) {
             if (err?.code === statusCodes.SIGN_IN_CANCELLED) {
                 // user cancelled, do nothing
             } else {
-                const message =
-                    err instanceof Error
-                        ? err.message
-                        : "Authentication failed";
-                setError(message);
+                setError(
+                    err instanceof Error ? err.message : "Authentication failed",
+                );
             }
         } finally {
             setLoading(false);
@@ -61,25 +81,45 @@ export default function LandingScreen() {
         setLoading(true);
         setError(null);
         try {
-            const { firstName, lastName, email } = await signInForSignUp();
-            if (!isUGAEmail(email)) {
+            const profile = await signIn();
+
+            if (!isUGAEmail(profile.email)) {
                 await signOut();
-                setError(
-                    "Access restricted to UGA email addresses (@uga.edu).",
-                );
+                setError("Access restricted to UGA email addresses (@uga.edu).");
                 return;
             }
-            router.push({
-                pathname: "/(auth)/sign-up",
-                params: { firstName, lastName, email },
-            });
+
+            try {
+                await verifyGoogleSignUp(profile.idToken);
+                // 200 = account doesn't exist yet, proceed to sign-up form
+                setPendingIdToken(profile.idToken);
+                router.push({
+                    pathname: "/(auth)/sign-up",
+                    params: {
+                        firstName: profile.firstName,
+                        lastName: profile.lastName,
+                        email: profile.email,
+                    },
+                });
+            } catch (apiErr: any) {
+                // 409 = account already exists → auto sign-in
+                if (apiErr?.response?.status === 409) {
+                    const user = await signInWithGoogle(profile.idToken);
+                    setAuthToken(user.token);
+                    await saveAuthData(user.token, user.id);
+                    setUser(user);
+                    router.replace("/(protected)/(tabs)");
+                } else {
+                    throw apiErr;
+                }
+            }
         } catch (err: any) {
-            if (err?.code !== statusCodes.SIGN_IN_CANCELLED) {
-                const message =
-                    err instanceof Error
-                        ? err.message
-                        : "Authentication failed";
-                setError(message);
+            if (err?.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled, do nothing
+            } else {
+                setError(
+                    err instanceof Error ? err.message : "Authentication failed",
+                );
             }
         } finally {
             setLoading(false);
@@ -135,10 +175,6 @@ export default function LandingScreen() {
                 visible={!!error}
                 onDismiss={() => setError(null)}
                 style={{
-                    // position: "absolute",
-                    // bottom: 0,
-                    // left: 0,
-                    // right: 0,
                     borderRadius: 36,
                     backgroundColor: colors.errorContainer,
                     width: "90%",

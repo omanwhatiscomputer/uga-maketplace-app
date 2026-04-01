@@ -1,8 +1,10 @@
+import { clearAuthToken } from "@/api/client";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { useGoogleAuth } from "@/hooks/use-google-auth";
+import { clearAuthData } from "@/utils/auth-storage";
 import { Tabs, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Animated, Dimensions, Pressable, StyleSheet } from "react-native";
@@ -99,6 +101,8 @@ export default function TabsLayout() {
     const handleSignOut = async () => {
         closeDrawer();
         await signOut();
+        await clearAuthData();
+        clearAuthToken();
         setUser(null);
         router.replace("/(auth)/landing");
     };

@@ -10,7 +10,7 @@ const WEB_CLIENT_ID =
 const IOS_CLIENT_ID =
     "249897655210-sag9kcv24299mjrj73e3ok70omr72u5n.apps.googleusercontent.com";
 
-type GoogleProfile = {
+export type GoogleProfile = {
     idToken: string;
     firstName: string;
     lastName: string;
@@ -26,20 +26,7 @@ export function useGoogleAuth() {
         });
     }, []);
 
-    const signIn = async (): Promise<{ idToken: string; email: string }> => {
-        await GoogleSignin.hasPlayServices();
-        const response = await GoogleSignin.signIn();
-        if (!isSuccessResponse(response)) {
-            throw new Error("Sign in was cancelled");
-        }
-        const { idToken, user } = response.data;
-        if (!idToken) {
-            throw new Error("No ID token received");
-        }
-        return { idToken, email: user.email };
-    };
-
-    const signInForSignUp = async (): Promise<GoogleProfile> => {
+    const signIn = async (): Promise<GoogleProfile> => {
         await GoogleSignin.hasPlayServices();
         const response = await GoogleSignin.signIn();
         if (!isSuccessResponse(response)) {
@@ -61,7 +48,7 @@ export function useGoogleAuth() {
         await GoogleSignin.signOut();
     };
 
-    return { signIn, signInForSignUp, signOut };
+    return { signIn, signOut };
 }
 
 export { statusCodes };

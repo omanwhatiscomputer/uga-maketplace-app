@@ -1,27 +1,56 @@
 import { apiClient } from "@/api/client";
-import type { AppUser } from "@/context/app-context";
+import type { AppUser, UserDTO } from "@/context/app-context";
 
 type GoogleSignInResponse = {
-    message: string;
+    token: string;
+    user: UserDTO;
+};
+
+type GoogleSignUpCheckResponse = {
     googleId: string;
     email: string;
     name: string;
 };
 
-export async function googleSignIn(idToken: string): Promise<AppUser> {
-    const response = await apiClient.post<GoogleSignInResponse>(
+type CreateAccountResponse = {
+    token: string;
+    user: UserDTO;
+};
+
+type CreateAccountDTO = {
+    email: string;
+    firstName: string;
+    lastName: string;
+    mobileNumber: string;
+};
+
+// Verifies the Google account doesn't exist yet (200 = OK to sign up, 409 = already exists)
+export async function verifyGoogleSignUp(
+    idToken: string,
+): Promise<GoogleSignUpCheckResponse> {
+    const response = await apiClient.post<GoogleSignUpCheckResponse>(
         "/auth/google-signup",
         null,
-        {
-            headers: {
-                Authorization: `Bearer ${idToken}`,
-            },
-        },
+        { headers: { Authorization: `Bearer ${idToken}` } },
     );
+    return response.data;
+}
 
-    return {
-        googleId: response.data.googleId,
-        email: response.data.email,
-        fullName: response.data.name,
-    };
+// Signs in an existing user with their Google ID token
+export async function signInWithGoogle(idToken: string): Promise<AppUser> {
+    const response = await apiClient.post<GoogleSignInResponse>(
+        "/auth/google-signin",
+        null,
+        { headers: { Authorization: `Bearer ${idToken}` } },
+    );
+    return { ...response.data.user, token: response.data.token };
+}
+
+// Creates a new account with the collected user data
+export async function createAccount(data: CreateAccountDTO): Promise<AppUser> {
+    const response = await apiClient.post<CreateAccountResponse>(
+        "/auth/create-account",
+        data,
+    );
+    return { ...response.data.user, token: response.data.token };
 }

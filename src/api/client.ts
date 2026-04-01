@@ -6,3 +6,11 @@ export const apiClient = axios.create({
         "Content-Type": "application/json",
     },
 });
+
+export function setAuthToken(token: string) {
+    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
+export function clearAuthToken() {
+    delete apiClient.defaults.headers.common["Authorization"];
+}
