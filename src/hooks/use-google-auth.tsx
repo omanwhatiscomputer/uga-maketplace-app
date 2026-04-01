@@ -26,14 +26,17 @@ export function useGoogleAuth() {
         });
     }, []);
 
-    const signIn = async (): Promise<string> => {
+    const signIn = async (): Promise<{ idToken: string; email: string }> => {
         await GoogleSignin.hasPlayServices();
-        await GoogleSignin.signIn();
-        const tokens = await GoogleSignin.getTokens();
-        if (!tokens.idToken) {
+        const response = await GoogleSignin.signIn();
+        if (!isSuccessResponse(response)) {
+            throw new Error("Sign in was cancelled");
+        }
+        const { idToken, user } = response.data;
+        if (!idToken) {
             throw new Error("No ID token received");
         }
-        return tokens.idToken;
+        return { idToken, email: user.email };
     };
 
     const signInForSignUp = async (): Promise<GoogleProfile> => {
