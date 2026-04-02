@@ -9,13 +9,18 @@ const PRODUCT_IMAGES_BUCKET = process.env.EXPO_PUBLIC_SUPABASE_BUCKET_NAME!;
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
         storage: AsyncStorage,
-        autoRefreshToken: false,
-        persistSession: false,
+        autoRefreshToken: true,
+        persistSession: true,
         detectSessionInUrl: false,
     },
 });
 
 export async function uploadProductImage(uri: string): Promise<string> {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) throw new Error("Not authenticated with storage service.");
+
     const ext = uri.split(".").pop()?.toLowerCase() ?? "jpg";
     const contentType = `image/${ext === "jpg" ? "jpeg" : ext}`;
     const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;

@@ -1,5 +1,6 @@
 import { setAuthToken } from "@/api/client";
 import { signInWithGoogle, verifyGoogleSignUp } from "@/api/endpoints/auth";
+import { supabase } from "@/lib/supabase";
 import { ThemedText } from "@/components/themed-text";
 import { globalStyles } from "@/constants/global-styles";
 import { TextVariants } from "@/constants/typography";
@@ -41,6 +42,12 @@ export default function LandingScreen() {
                 setError("Access restricted to UGA email addresses (@uga.edu).");
                 return;
             }
+
+            const { error: supabaseError } = await supabase.auth.signInWithIdToken({
+                provider: "google",
+                token: profile.idToken,
+            });
+            if (supabaseError) throw new Error(supabaseError.message);
 
             try {
                 const user = await signInWithGoogle(profile.idToken);
@@ -88,6 +95,12 @@ export default function LandingScreen() {
                 setError("Access restricted to UGA email addresses (@uga.edu).");
                 return;
             }
+
+            const { error: supabaseError } = await supabase.auth.signInWithIdToken({
+                provider: "google",
+                token: profile.idToken,
+            });
+            if (supabaseError) throw new Error(supabaseError.message);
 
             try {
                 await verifyGoogleSignUp(profile.idToken);

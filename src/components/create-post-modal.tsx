@@ -111,11 +111,11 @@ export function CreatePostModal({
         try {
             const imageUrls = await Promise.all(images.map(uploadProductImage));
             await createProduct({
-                title: title.trim(),
-                description: description.trim(),
+                productName: title.trim(),
+                productDescription: description.trim(),
                 price: parseFloat(price),
                 category,
-                imageUrls,
+                productImages: imageUrls,
             });
             handleClose();
         } catch (err: any) {

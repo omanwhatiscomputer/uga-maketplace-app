@@ -1,11 +1,11 @@
 import { apiClient } from "@/api/client";
 
 type CreateProductDTO = {
-    title: string;
-    description: string;
+    productName: string;
+    productDescription: string;
     price: number;
     category: string;
-    imageUrls: string[];
+    productImages: string[];
 };
 
 type ProductDTO = {
