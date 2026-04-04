@@ -9,7 +9,7 @@ import { useAppTheme } from "@/hooks/use-app-theme";
 import { statusCodes, useGoogleAuth } from "@/hooks/use-google-auth";
 import { saveAuthData } from "@/utils/auth-storage";
 import { setPendingIdToken } from "@/utils/temp-auth-store";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { useState } from "react";
 import {
     ActivityIndicator,
@@ -23,11 +23,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LandingScreen() {
     const router = useRouter();
-    const { setUser } = useAppContext();
+    const { setUser, isAuthenticated } = useAppContext();
     const { signIn, signOut } = useGoogleAuth();
     const { colors } = useAppTheme();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    if (isAuthenticated) {
+        return <Redirect href="/(protected)/(tabs)" />;
+    }
 
     const isUGAEmail = (email: string) => email.endsWith("@uga.edu");
 
