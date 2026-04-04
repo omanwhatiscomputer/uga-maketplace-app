@@ -41,6 +41,8 @@ const CATEGORIES = [
     "Other",
 ];
 
+const CONDITIONS = ["Premium", "Excellent", "Good", "Acceptable", "Poor"];
+
 type CreatePostModalProps = {
     visible: boolean;
     translateY: Animated.Value;
@@ -61,6 +63,7 @@ export function CreatePostModal({
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [category, setCategory] = useState("");
+    const [condition, setCondition] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -70,6 +73,7 @@ export function CreatePostModal({
         setDescription("");
         setPrice("");
         setCategory("");
+        setCondition("");
         setError(null);
     };
 
@@ -103,6 +107,7 @@ export function CreatePostModal({
         price.trim() &&
         !isNaN(parseFloat(price)) &&
         category &&
+        condition &&
         images.length > 0;
 
     const handleSubmit = async () => {
@@ -115,6 +120,7 @@ export function CreatePostModal({
                 productDescription: description.trim(),
                 price: parseFloat(price),
                 category,
+                condition,
                 productImages: imageUrls,
             });
             handleClose();
@@ -331,6 +337,46 @@ export function CreatePostModal({
                                     }
                                 >
                                     {cat}
+                                </Chip>
+                            ))}
+                        </Surface>
+
+                        {/* Condition chips */}
+                        <Text
+                            variant="labelLarge"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
+                            Condition
+                        </Text>
+                        <Surface
+                            elevation={0}
+                            style={{
+                                flexDirection: "row",
+                                flexWrap: "wrap",
+                                gap: 8,
+                            }}
+                        >
+                            {CONDITIONS.map((cond) => (
+                                <Chip
+                                    key={cond}
+                                    selected={condition === cond}
+                                    onPress={() =>
+                                        setCondition(
+                                            condition === cond ? "" : cond,
+                                        )
+                                    }
+                                    showSelectedCheck={false}
+                                    selectedColor={colors.onPrimary}
+                                    style={
+                                        condition === cond
+                                            ? {
+                                                  backgroundColor:
+                                                      colors.primary,
+                                              }
+                                            : undefined
+                                    }
+                                >
+                                    {cond}
                                 </Chip>
                             ))}
                         </Surface>

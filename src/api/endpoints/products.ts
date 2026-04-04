@@ -5,6 +5,7 @@ type CreateProductDTO = {
     productDescription: string;
     price: number;
     category: string;
+    condition: string;
     productImages: string[];
 };
 
@@ -13,6 +14,7 @@ export type ProductSummaryDTO = {
     productName: string;
     price: number;
     category: string;
+    condition: string;
     sellerName: string;
     isAvailable: boolean;
     productImages: string[];

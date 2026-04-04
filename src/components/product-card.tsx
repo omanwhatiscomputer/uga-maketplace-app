@@ -3,7 +3,7 @@ import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { Image, StyleSheet } from "react-native";
-import { Button, Card, Surface } from "react-native-paper";
+import { Button, Card, Chip, Surface } from "react-native-paper";
 
 type ProductCardProps = {
     product: ProductSummaryDTO;
@@ -83,6 +83,14 @@ export function ProductCard({
                         >
                             ${product.price.toFixed(2)}
                         </ThemedText>
+                        {product.condition && (
+                            <Chip
+                                compact
+                                style={{ alignSelf: "flex-start", marginTop: 4 }}
+                            >
+                                {product.condition}
+                            </Chip>
+                        )}
                         {formattedDate && (
                             <ThemedText
                                 variant={TextVariants.label_sm}
