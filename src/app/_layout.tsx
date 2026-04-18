@@ -6,6 +6,7 @@ import { clearAuthData, getAuthData } from "@/utils/auth-storage";
 import { Slot } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PaperProvider } from "react-native-paper";
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
@@ -39,12 +40,14 @@ export default function RootLayout() {
     const activeTheme = colorScheme === "dark" ? DarkTheme : LightTheme;
 
     return (
-        <AppProvider>
-            <PaperProvider theme={activeTheme}>
-                <AppInitializer>
-                    <Slot />
-                </AppInitializer>
-            </PaperProvider>
-        </AppProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <AppProvider>
+                <PaperProvider theme={activeTheme}>
+                    <AppInitializer>
+                        <Slot />
+                    </AppInitializer>
+                </PaperProvider>
+            </AppProvider>
+        </GestureHandlerRootView>
     );
 }

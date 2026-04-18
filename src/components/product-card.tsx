@@ -12,6 +12,7 @@ type ProductCardProps = {
     onPress: () => void;
     onToggleWishlist: () => void;
     onToggleSubscribe: () => void;
+    showActions?: boolean;
 };
 
 export function ProductCard({
@@ -21,6 +22,7 @@ export function ProductCard({
     onPress,
     onToggleWishlist,
     onToggleSubscribe,
+    showActions = true,
 }: ProductCardProps) {
     const { colors } = useAppTheme();
 
@@ -103,30 +105,32 @@ export function ProductCard({
                 </Surface>
             </Card.Content>
 
-            <Card.Actions style={styles.actions}>
-                <Button
-                    mode={isWishlisted ? "contained" : "outlined"}
-                    buttonColor={isWishlisted ? colors.primary : undefined}
-                    textColor={isWishlisted ? colors.onPrimary : undefined}
-                    icon={isWishlisted ? "heart" : "heart-outline"}
-                    onPress={onToggleWishlist}
-                    compact
-                    style={styles.actionBtn}
-                >
-                    {isWishlisted ? "Wishlisted" : "Wishlist"}
-                </Button>
-                <Button
-                    mode={isSubscribed ? "contained" : "outlined"}
-                    buttonColor={isSubscribed ? colors.primary : undefined}
-                    textColor={isSubscribed ? colors.onPrimary : undefined}
-                    icon={isSubscribed ? "bell" : "bell-outline"}
-                    onPress={onToggleSubscribe}
-                    compact
-                    style={styles.actionBtn}
-                >
-                    {isSubscribed ? "Subscribed" : "Subscribe"}
-                </Button>
-            </Card.Actions>
+            {showActions && (
+                <Card.Actions style={styles.actions}>
+                    <Button
+                        mode={isWishlisted ? "contained" : "outlined"}
+                        buttonColor={isWishlisted ? colors.primary : undefined}
+                        textColor={isWishlisted ? colors.onPrimary : undefined}
+                        icon={isWishlisted ? "heart" : "heart-outline"}
+                        onPress={onToggleWishlist}
+                        compact
+                        style={styles.actionBtn}
+                    >
+                        {isWishlisted ? "Wishlisted" : "Wishlist"}
+                    </Button>
+                    <Button
+                        mode={isSubscribed ? "contained" : "outlined"}
+                        buttonColor={isSubscribed ? colors.primary : undefined}
+                        textColor={isSubscribed ? colors.onPrimary : undefined}
+                        icon={isSubscribed ? "bell" : "bell-outline"}
+                        onPress={onToggleSubscribe}
+                        compact
+                        style={styles.actionBtn}
+                    >
+                        {isSubscribed ? "Subscribed" : "Subscribe"}
+                    </Button>
+                </Card.Actions>
+            )}
         </Card>
     );
 }

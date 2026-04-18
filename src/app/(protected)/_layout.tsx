@@ -1,5 +1,5 @@
 import { useAppContext } from "@/context/app-context";
-import { Redirect, Slot } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 
 export default function ProtectedLayout() {
     const { isAuthenticated } = useAppContext();
@@ -8,5 +8,5 @@ export default function ProtectedLayout() {
         return <Redirect href="/(auth)/landing" />;
     }
 
-    return <Slot />;
+    return <Stack screenOptions={{ headerShown: false }} />;
 }
