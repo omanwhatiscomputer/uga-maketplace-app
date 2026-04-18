@@ -13,8 +13,8 @@ import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import {
     ActivityIndicator,
@@ -44,6 +44,7 @@ const CATEGORIES: { label: string; icon: string }[] = [
 export default function CategoryScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
+    const navigation = useNavigation();
     const { wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -51,12 +52,6 @@ export default function CategoryScreen() {
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    useFocusEffect(
-        useCallback(() => {
-            if (selectedCategory) fetchByCategory(selectedCategory);
-        }, [selectedCategory, fetchByCategory]),
-    );
 
     const fetchByCategory = useCallback(async (category: string, isRefresh = false) => {
         if (isRefresh) setRefreshing(true);
@@ -71,6 +66,13 @@ export default function CategoryScreen() {
             setRefreshing(false);
         }
     }, []);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener("tabPress" as any, () => {
+            if (selectedCategory) fetchByCategory(selectedCategory);
+        });
+        return unsubscribe;
+    }, [navigation, selectedCategory, fetchByCategory]);
 
     const handleCategoryPress = (category: string) => {
         setSelectedCategory(category);

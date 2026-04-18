@@ -10,14 +10,15 @@ import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import { ActivityIndicator, Snackbar, Surface, Text } from "react-native-paper";
 
 export default function ExploreScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
+    const navigation = useNavigation();
     const { wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
 
     const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
@@ -39,7 +40,13 @@ export default function ExploreScreen() {
         }
     }, []);
 
-    useFocusEffect(fetchProducts);
+    useEffect(() => {
+        fetchProducts();
+        const unsubscribe = navigation.addListener("tabPress" as any, () => {
+            fetchProducts();
+        });
+        return unsubscribe;
+    }, [navigation, fetchProducts]);
 
     const handleToggleWishlist = async (productId: string) => {
         const already = wishlisted.has(productId);

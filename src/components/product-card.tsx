@@ -122,7 +122,7 @@ export function ProductCard({
                         mode={isSubscribed ? "contained" : "outlined"}
                         buttonColor={isSubscribed ? colors.primary : undefined}
                         textColor={isSubscribed ? colors.onPrimary : undefined}
-                        icon={isSubscribed ? "bell" : "bell-outline"}
+                        icon={isSubscribed ? "cart" : "cart-outline"}
                         onPress={onToggleSubscribe}
                         compact
                         style={styles.actionBtn}

@@ -169,7 +169,7 @@ export default function TabsLayout() {
                         title: "Subscribed",
                         tabBarIcon: ({ color }) => (
                             <Icon
-                                source="bell-outline"
+                                source="cart-outline"
                                 size={24}
                                 color={color}
                             />

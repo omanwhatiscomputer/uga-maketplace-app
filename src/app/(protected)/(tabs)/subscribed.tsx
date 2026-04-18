@@ -5,8 +5,8 @@ import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { ActivityIndicator, Icon, Snackbar, Surface, Text, TouchableRipple } from "react-native-paper";
@@ -31,6 +31,7 @@ function RemoveAction({ onPress }: { onPress: () => void }) {
 export default function SubscribedScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
+    const navigation = useNavigation();
     const { user, setSubscribed } = useAppContext();
 
     const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
@@ -54,7 +55,13 @@ export default function SubscribedScreen() {
         }
     }, [user]);
 
-    useFocusEffect(fetchSubscriptions);
+    useEffect(() => {
+        fetchSubscriptions();
+        const unsubscribe = navigation.addListener("tabPress" as any, () => {
+            fetchSubscriptions();
+        });
+        return unsubscribe;
+    }, [navigation, fetchSubscriptions]);
 
     const handleRemove = async (productId: string) => {
         swipeableRefs.current.get(productId)?.close();
