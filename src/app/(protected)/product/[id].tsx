@@ -5,13 +5,73 @@ import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
 import type { UserDTO } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Appbar, Divider, Surface, TouchableRipple } from "react-native-paper";
+import {
+    ActivityIndicator,
+    Appbar,
+    Divider,
+    IconButton,
+    Portal,
+    Surface,
+    TouchableRipple,
+} from "react-native-paper";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 const CAROUSEL_HEIGHT = 260;
+
+function FullScreenImage({ uri, onClose }: { uri: string; onClose: () => void }) {
+    const scale = useSharedValue(1);
+    const savedScale = useSharedValue(1);
+
+    const pinch = Gesture.Pinch()
+        .onUpdate((e) => {
+            scale.value = Math.max(1, Math.min(savedScale.value * e.scale, 5));
+        })
+        .onEnd(() => {
+            savedScale.value = scale.value;
+        });
+
+    const doubleTap = Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd(() => {
+            scale.value = withTiming(1);
+            savedScale.value = 1;
+        });
+
+    const composed = Gesture.Simultaneous(pinch, doubleTap);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
+    return (
+        <View style={styles.fullScreenOverlay}>
+            <GestureDetector gesture={composed}>
+                <Animated.Image
+                    source={{ uri }}
+                    style={[styles.fullScreenImage, animatedStyle]}
+                    resizeMode="contain"
+                />
+            </GestureDetector>
+            <IconButton
+                icon="close"
+                size={28}
+                iconColor="white"
+                style={styles.fullScreenClose}
+                onPress={onClose}
+            />
+        </View>
+    );
+}
 
 export default function ProductDetailScreen() {
     const { colors } = useAppTheme();
@@ -26,6 +86,7 @@ export default function ProductDetailScreen() {
     const [seller, setSeller] = useState<UserDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [fullScreenUri, setFullScreenUri] = useState<string | null>(null);
 
     useEffect(() => {
         getProductById(id)
@@ -119,11 +180,16 @@ export default function ProductDetailScreen() {
                                     );
                                 }}
                                 renderItem={({ item }) => (
-                                    <Image
-                                        source={{ uri: item }}
-                                        style={styles.carouselImage}
-                                        resizeMode="cover"
-                                    />
+                                    <TouchableRipple
+                                        onPress={() => setFullScreenUri(item)}
+                                        style={styles.carouselImageWrapper}
+                                    >
+                                        <Image
+                                            source={{ uri: item }}
+                                            style={styles.carouselImage}
+                                            resizeMode="cover"
+                                        />
+                                    </TouchableRipple>
                                 )}
                             />
                             {product.productImages.length > 1 && (
@@ -236,6 +302,16 @@ export default function ProductDetailScreen() {
                     </ThemedText>
                 </Surface>
             )}
+
+            {/* Full screen image viewer */}
+            <Portal>
+                {fullScreenUri && (
+                    <FullScreenImage
+                        uri={fullScreenUri}
+                        onClose={() => setFullScreenUri(null)}
+                    />
+                )}
+            </Portal>
         </Surface>
     );
 }
@@ -262,6 +338,10 @@ const styles = StyleSheet.create({
     carouselWrapper: {
         marginHorizontal: -16,
     },
+    carouselImageWrapper: {
+        width: SCREEN_WIDTH,
+        height: CAROUSEL_HEIGHT,
+    },
     carouselImage: {
         width: SCREEN_WIDTH,
         height: CAROUSEL_HEIGHT,
@@ -279,5 +359,26 @@ const styles = StyleSheet.create({
     },
     divider: {
         marginVertical: 4,
+    },
+    fullScreenOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    fullScreenImage: {
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
+    },
+    fullScreenClose: {
+        position: "absolute",
+        top: 40,
+        right: 8,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        borderRadius: 20,
     },
 });
