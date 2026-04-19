@@ -45,7 +45,7 @@ export default function CategoryScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
     const navigation = useNavigation();
-    const { wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
+    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
@@ -58,14 +58,14 @@ export default function CategoryScreen() {
         else setLoading(true);
         try {
             const data = await getProductsByCategory(category);
-            setProducts(data);
+            setProducts(data.filter((p) => p.sellerId !== user?.id));
         } catch {
             setError("Failed to load products.");
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [user?.id]);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener("tabPress" as any, () => {

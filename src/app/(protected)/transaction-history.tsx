@@ -11,7 +11,10 @@ export default function TransactionHistoryScreen() {
     return (
         <Surface style={{ flex: 1 }} elevation={0}>
             <Appbar.Header>
-                <Appbar.BackAction onPress={router.back} color={colors.primary} />
+                <Appbar.BackAction
+                    onPress={router.back}
+                    color={colors.primary}
+                />
                 <Appbar.Content title="Transaction History" />
             </Appbar.Header>
             <Surface

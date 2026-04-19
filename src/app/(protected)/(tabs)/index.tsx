@@ -19,7 +19,7 @@ export default function ExploreScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
     const navigation = useNavigation();
-    const { wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
+    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
 
     const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
     const [loading, setLoading] = useState(true);
@@ -31,14 +31,14 @@ export default function ExploreScreen() {
         else setLoading(true);
         try {
             const data = await getAllProducts();
-            setProducts([...data].reverse());
+            setProducts([...data].reverse().filter((p) => p.sellerId !== user?.id));
         } catch {
             setError("Failed to load listings.");
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [user?.id]);
 
     useEffect(() => {
         fetchProducts();

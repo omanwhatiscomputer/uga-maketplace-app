@@ -3,7 +3,13 @@ import {
     updateProductLocation,
     type ProductDTO,
 } from "@/api/endpoints/products";
-import { getUserById } from "@/api/endpoints/users";
+import {
+    addToWishlist,
+    getUserById,
+    removeFromWishlist,
+    subscribeToProduct,
+    unsubscribeFromProduct,
+} from "@/api/endpoints/users";
 import { MeetupLocationModal } from "@/components/meetup-location-modal";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
@@ -101,7 +107,7 @@ export default function ProductDetailScreen() {
         id: string;
         productName: string;
     }>();
-    const { user } = useAppContext();
+    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
 
     const [product, setProduct] = useState<ProductDTO | null>(null);
     const [seller, setSeller] = useState<UserDTO | null>(null);
@@ -159,6 +165,48 @@ export default function ProductDetailScreen() {
     };
 
     const isSeller = !!user && !!product && product.sellerId === user.id;
+    const isWishlisted = !!product && wishlisted.has(product.id);
+    const isSubscribed = !!product && subscribed.has(product.id);
+
+    const handleToggleWishlist = async () => {
+        if (!product) return;
+        setWishlisted((prev) => {
+            const next = new Set(prev);
+            isWishlisted ? next.delete(product.id) : next.add(product.id);
+            return next;
+        });
+        try {
+            isWishlisted
+                ? await removeFromWishlist(product.id)
+                : await addToWishlist(product.id);
+        } catch {
+            setWishlisted((prev) => {
+                const next = new Set(prev);
+                isWishlisted ? next.add(product.id) : next.delete(product.id);
+                return next;
+            });
+        }
+    };
+
+    const handleToggleSubscribe = async () => {
+        if (!product) return;
+        setSubscribed((prev) => {
+            const next = new Set(prev);
+            isSubscribed ? next.delete(product.id) : next.add(product.id);
+            return next;
+        });
+        try {
+            isSubscribed
+                ? await unsubscribeFromProduct(product.id)
+                : await subscribeToProduct(product.id);
+        } catch {
+            setSubscribed((prev) => {
+                const next = new Set(prev);
+                isSubscribed ? next.add(product.id) : next.delete(product.id);
+                return next;
+            });
+        }
+    };
 
     return (
         <Surface style={styles.screen} elevation={0}>
@@ -262,6 +310,32 @@ export default function ProductDetailScreen() {
                                     ))}
                                 </Surface>
                             )}
+                        </Surface>
+                    )}
+
+                    {/* Wishlist + Subscribe — buyers only */}
+                    {!isSeller && (
+                        <Surface elevation={0} style={styles.actionButtons}>
+                            <Button
+                                mode={isWishlisted ? "contained" : "outlined"}
+                                buttonColor={isWishlisted ? colors.primary : undefined}
+                                textColor={isWishlisted ? colors.onPrimary : undefined}
+                                icon={isWishlisted ? "heart" : "heart-outline"}
+                                onPress={handleToggleWishlist}
+                                style={styles.actionBtn}
+                            >
+                                {isWishlisted ? "Wishlisted" : "Wishlist"}
+                            </Button>
+                            <Button
+                                mode={isSubscribed ? "contained" : "outlined"}
+                                buttonColor={isSubscribed ? colors.primary : undefined}
+                                textColor={isSubscribed ? colors.onPrimary : undefined}
+                                icon={isSubscribed ? "cart" : "cart-outline"}
+                                onPress={handleToggleSubscribe}
+                                style={styles.actionBtn}
+                            >
+                                {isSubscribed ? "Subscribed" : "Subscribe"}
+                            </Button>
                         </Surface>
                     )}
 
@@ -473,6 +547,14 @@ const styles = StyleSheet.create({
     },
     divider: {
         marginVertical: 4,
+    },
+    actionButtons: {
+        gap: 10,
+        marginHorizontal: -16,
+        paddingHorizontal: 16,
+    },
+    actionBtn: {
+        borderRadius: 0,
     },
     locationPreview: {
         height: 180,

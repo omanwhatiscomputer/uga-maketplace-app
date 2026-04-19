@@ -1,13 +1,14 @@
 import { clearAuthToken } from "@/api/client";
-import { getUserById } from "@/api/endpoints/users";
+import { getUserById, savePushToken } from "@/api/endpoints/users";
 import { CreatePostModal } from "@/components/create-post-modal";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { useGoogleAuth } from "@/hooks/use-google-auth";
 import { clearAuthData } from "@/utils/auth-storage";
+import * as Notifications from "expo-notifications";
 import { Tabs, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, Pressable, StyleSheet } from "react-native";
+import { Animated, Dimensions, Platform, Pressable, StyleSheet } from "react-native";
 import {
     Appbar,
     Drawer,
@@ -33,6 +34,22 @@ export default function TabsLayout() {
             setWishlisted(new Set(data.wishlist.map((p) => p.id)));
             setSubscribed(new Set(data.subscriptions.map((p) => p.id)));
         }).catch(() => {});
+    }, [user]);
+
+    useEffect(() => {
+        if (!user) return;
+        (async () => {
+            if (Platform.OS === "android") {
+                await Notifications.setNotificationChannelAsync("default", {
+                    name: "default",
+                    importance: Notifications.AndroidImportance.DEFAULT,
+                });
+            }
+            const { status } = await Notifications.requestPermissionsAsync();
+            if (status !== "granted") return;
+            const tokenData = await Notifications.getExpoPushTokenAsync();
+            await savePushToken(tokenData.data).catch(() => {});
+        })();
     }, [user]);
 
     const [drawerOpen, setDrawerOpen] = useState(false);
