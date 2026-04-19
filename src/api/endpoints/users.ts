@@ -26,3 +26,7 @@ export async function subscribeToProduct(productId: string): Promise<void> {
 export async function unsubscribeFromProduct(productId: string): Promise<void> {
     await apiClient.delete(`/user/subscribe/${productId}`);
 }
+
+export async function savePushToken(token: string): Promise<void> {
+    await apiClient.patch("/user/push-token", { expoPushToken: token });
+}
