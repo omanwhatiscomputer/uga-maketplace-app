@@ -1,5 +1,10 @@
-import { toggleAvailability, type ProductDTO, type UserSummaryDTO } from "@/api/endpoints/products";
+import {
+    toggleAvailability,
+    type Product,
+    type UserSummary,
+} from "@/api/endpoints/products";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, FlatList, StyleSheet } from "react-native";
 import {
@@ -13,15 +18,14 @@ import {
     Text,
     TouchableRipple,
 } from "react-native-paper";
-import * as Notifications from "expo-notifications";
 
 const MODAL_HEIGHT = Dimensions.get("window").height * 0.6;
 
 type MarkAsSoldModalProps = {
     visible: boolean;
-    product: ProductDTO;
+    product: Product;
     onClose: () => void;
-    onConfirm: (updated: ProductDTO) => void;
+    onConfirm: (updated: Product) => void;
 };
 
 export function MarkAsSoldModal({
@@ -34,7 +38,7 @@ export function MarkAsSoldModal({
     const translateY = useRef(new Animated.Value(MODAL_HEIGHT)).current;
     const backdropOpacity = useRef(new Animated.Value(0)).current;
 
-    const [selected, setSelected] = useState<UserSummaryDTO | null>(null);
+    const [selected, setSelected] = useState<UserSummary | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -42,13 +46,29 @@ export function MarkAsSoldModal({
         if (visible) {
             setSelected(null);
             Animated.parallel([
-                Animated.timing(translateY, { toValue: 0, duration: 300, useNativeDriver: true }),
-                Animated.timing(backdropOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+                Animated.timing(translateY, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(backdropOpacity, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
             ]).start();
         } else {
             Animated.parallel([
-                Animated.timing(translateY, { toValue: MODAL_HEIGHT, duration: 300, useNativeDriver: true }),
-                Animated.timing(backdropOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+                Animated.timing(translateY, {
+                    toValue: MODAL_HEIGHT,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(backdropOpacity, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
             ]).start();
         }
     }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -97,10 +117,17 @@ export function MarkAsSoldModal({
                 pointerEvents={visible ? "auto" : "none"}
                 style={[
                     StyleSheet.absoluteFill,
-                    { backgroundColor: "rgba(0,0,0,0.5)", opacity: backdropOpacity },
+                    {
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        opacity: backdropOpacity,
+                    },
                 ]}
             >
-                <TouchableRipple style={StyleSheet.absoluteFill} onPress={onClose} borderless>
+                <TouchableRipple
+                    style={StyleSheet.absoluteFill}
+                    onPress={onClose}
+                    borderless
+                >
                     <Surface style={StyleSheet.absoluteFill} elevation={0} />
                 </TouchableRipple>
             </Animated.View>
@@ -111,7 +138,10 @@ export function MarkAsSoldModal({
             >
                 <Surface style={styles.surface} elevation={4}>
                     <Surface elevation={0} style={styles.header}>
-                        <Text variant="titleMedium" style={{ flex: 1, color: colors.onSurface }}>
+                        <Text
+                            variant="titleMedium"
+                            style={{ flex: 1, color: colors.onSurface }}
+                        >
                             Select Buyer
                         </Text>
                         <IconButton icon="close" onPress={onClose} />
@@ -119,7 +149,11 @@ export function MarkAsSoldModal({
 
                     <Text
                         variant="bodySmall"
-                        style={{ color: colors.onSurfaceVariant, paddingHorizontal: 16, paddingBottom: 8 }}
+                        style={{
+                            color: colors.onSurfaceVariant,
+                            paddingHorizontal: 16,
+                            paddingBottom: 8,
+                        }}
                     >
                         Choose the subscriber this item is being sold to.
                     </Text>
@@ -135,30 +169,59 @@ export function MarkAsSoldModal({
                                     onPress={() => setSelected(item)}
                                     style={[
                                         styles.subscriberRow,
-                                        isSelected && { backgroundColor: colors.primaryContainer },
+                                        isSelected && {
+                                            backgroundColor:
+                                                colors.primaryContainer,
+                                        },
                                     ]}
                                 >
                                     <Surface
                                         elevation={0}
                                         style={[
                                             styles.subscriberInner,
-                                            isSelected && { backgroundColor: colors.primaryContainer },
+                                            isSelected && {
+                                                backgroundColor:
+                                                    colors.primaryContainer,
+                                            },
                                         ]}
                                     >
                                         <Avatar.Text
                                             size={40}
                                             label={`${item.firstName[0]}${item.lastName[0]}`}
-                                            style={{ backgroundColor: colors.primary }}
+                                            style={{
+                                                backgroundColor: colors.primary,
+                                            }}
                                             color={colors.onPrimary}
                                         />
-                                        <Surface elevation={0} style={{ flex: 1, backgroundColor: "transparent" }}>
-                                            <Text variant="titleSmall" style={{ color: colors.onSurface }}>
+                                        <Surface
+                                            elevation={0}
+                                            style={{
+                                                flex: 1,
+                                                backgroundColor: "transparent",
+                                            }}
+                                        >
+                                            <Text
+                                                variant="titleSmall"
+                                                style={{
+                                                    color: colors.onSurface,
+                                                }}
+                                            >
                                                 {item.firstName} {item.lastName}
                                             </Text>
-                                            <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                                            <Text
+                                                variant="bodySmall"
+                                                style={{
+                                                    color: colors.onSurfaceVariant,
+                                                }}
+                                            >
                                                 {item.email}
                                             </Text>
-                                            <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                                            <Text
+                                                variant="bodySmall"
+                                                style={{
+                                                    color: colors.onSurfaceVariant,
+                                                }}
+                                            >
                                                 {item.mobileNumber}
                                             </Text>
                                         </Surface>
@@ -169,7 +232,11 @@ export function MarkAsSoldModal({
                         ListEmptyComponent={
                             <Text
                                 variant="bodyMedium"
-                                style={{ color: colors.onSurfaceVariant, textAlign: "center", marginTop: 24 }}
+                                style={{
+                                    color: colors.onSurfaceVariant,
+                                    textAlign: "center",
+                                    marginTop: 24,
+                                }}
                             >
                                 No subscribers yet.
                             </Text>
@@ -204,7 +271,11 @@ export function MarkAsSoldModal({
                     alignSelf: "center",
                 }}
                 theme={{ colors: { inverseSurface: colors.onErrorContainer } }}
-                action={{ label: "✕", onPress: () => setError(null), textColor: colors.onErrorContainer }}
+                action={{
+                    label: "✕",
+                    onPress: () => setError(null),
+                    textColor: colors.onErrorContainer,
+                }}
             >
                 <Text style={{ color: colors.onErrorContainer }}>{error}</Text>
             </Snackbar>

@@ -3,8 +3,8 @@ import {
     getProductById,
     toggleAvailability,
     updateProductLocation,
-    type ProductDTO,
-    type UserSummaryDTO,
+    type Product,
+    type UserSummary,
 } from "@/api/endpoints/products";
 import { getUserById } from "@/api/endpoints/users";
 import { EditProductModal } from "@/components/edit-product-modal";
@@ -12,8 +12,8 @@ import { MarkAsSoldModal } from "@/components/mark-as-sold-modal";
 import { MeetupLocationModal } from "@/components/meetup-location-modal";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
+import type { User } from "@/context/app-context";
 import { useAppContext } from "@/context/app-context";
-import type { UserDTO } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -53,7 +53,13 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const CAROUSEL_HEIGHT = 260;
 
-function FullScreenImage({ uri, onClose }: { uri: string; onClose: () => void }) {
+function FullScreenImage({
+    uri,
+    onClose,
+}: {
+    uri: string;
+    onClose: () => void;
+}) {
     const scale = useSharedValue(1);
     const savedScale = useSharedValue(1);
 
@@ -96,7 +102,7 @@ function FullScreenImage({ uri, onClose }: { uri: string; onClose: () => void })
     );
 }
 
-function SubscriberCard({ subscriber }: { subscriber: UserSummaryDTO }) {
+function SubscriberCard({ subscriber }: { subscriber: UserSummary }) {
     const { colors } = useAppTheme();
     return (
         <Card style={styles.subscriberCard}>
@@ -108,13 +114,22 @@ function SubscriberCard({ subscriber }: { subscriber: UserSummaryDTO }) {
                     color={colors.onPrimary}
                 />
                 <Surface elevation={0} style={{ flex: 1 }}>
-                    <Text variant="titleSmall" style={{ color: colors.onSurface }}>
+                    <Text
+                        variant="titleSmall"
+                        style={{ color: colors.onSurface }}
+                    >
                         {subscriber.firstName} {subscriber.lastName}
                     </Text>
-                    <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                    <Text
+                        variant="bodySmall"
+                        style={{ color: colors.onSurfaceVariant }}
+                    >
                         {subscriber.email}
                     </Text>
-                    <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                    <Text
+                        variant="bodySmall"
+                        style={{ color: colors.onSurfaceVariant }}
+                    >
                         {subscriber.mobileNumber}
                     </Text>
                 </Surface>
@@ -132,8 +147,8 @@ export default function MyProductScreen() {
     }>();
     const { user } = useAppContext();
 
-    const [product, setProduct] = useState<ProductDTO | null>(null);
-    const [seller, setSeller] = useState<UserDTO | null>(null);
+    const [product, setProduct] = useState<Product | null>(null);
+    const [seller, setSeller] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
     const [fullScreenUri, setFullScreenUri] = useState<string | null>(null);
@@ -192,16 +207,25 @@ export default function MyProductScreen() {
         }
     };
 
-    const handleLocationConfirm = async (location: { latitude: number; longitude: number }) => {
+    const handleLocationConfirm = async (location: {
+        latitude: number;
+        longitude: number;
+    }) => {
         if (!product) return;
         try {
-            const updated = await updateProductLocation(product.id, location.latitude, location.longitude);
+            const updated = await updateProductLocation(
+                product.id,
+                location.latitude,
+                location.longitude,
+            );
             setProduct(updated);
         } catch {}
     };
 
     const openInMaps = (lat: number, lng: number) => {
-        Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+        Linking.openURL(
+            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+        );
     };
 
     return (
@@ -211,14 +235,21 @@ export default function MyProductScreen() {
                     title={product?.productName ?? initialName ?? "My Listing"}
                     titleStyle={{ fontWeight: "bold" }}
                 />
-                <Appbar.Action icon="pencil" onPress={() => setEditModalVisible(true)} />
+                <Appbar.Action
+                    icon="pencil"
+                    onPress={() => setEditModalVisible(true)}
+                />
                 <Appbar.Action icon="close" onPress={() => router.back()} />
             </Appbar.Header>
 
             <Divider />
 
             {loading ? (
-                <ActivityIndicator animating size="large" style={styles.loader} />
+                <ActivityIndicator
+                    animating
+                    size="large"
+                    style={styles.loader}
+                />
             ) : product ? (
                 <TabsProvider defaultIndex={0}>
                     <Tabs
@@ -233,24 +264,41 @@ export default function MyProductScreen() {
                                 {/* Mark as sold / available */}
                                 <Button
                                     mode="contained"
-                                    buttonColor={product.isAvailable ? colors.primary : colors.secondary}
-                                    textColor={product.isAvailable ? colors.onPrimary : colors.onSecondary}
+                                    buttonColor={
+                                        product.isAvailable
+                                            ? colors.primary
+                                            : colors.secondary
+                                    }
+                                    textColor={
+                                        product.isAvailable
+                                            ? colors.onPrimary
+                                            : colors.onSecondary
+                                    }
                                     onPress={handleToggleAvailability}
                                     style={styles.availabilityBtn}
                                 >
-                                    {product.isAvailable ? "Mark as Sold" : "Mark as Available"}
+                                    {product.isAvailable
+                                        ? "Mark as Sold"
+                                        : "Mark as Available"}
                                 </Button>
 
                                 {/* Description */}
                                 {product.productDescription ? (
-                                    <Surface elevation={0} style={styles.fieldBlock}>
+                                    <Surface
+                                        elevation={0}
+                                        style={styles.fieldBlock}
+                                    >
                                         <ThemedText
                                             variant={TextVariants.label_lg}
-                                            style={{ color: colors.onSurfaceVariant }}
+                                            style={{
+                                                color: colors.onSurfaceVariant,
+                                            }}
                                         >
                                             Description:
                                         </ThemedText>
-                                        <ThemedText variant={TextVariants.body_md}>
+                                        <ThemedText
+                                            variant={TextVariants.body_md}
+                                        >
                                             {product.productDescription}
                                         </ThemedText>
                                     </Surface>
@@ -258,57 +306,86 @@ export default function MyProductScreen() {
 
                                 {/* Price */}
                                 <Surface elevation={0} style={styles.inlineRow}>
-                                    <ThemedText variant={TextVariants.label_lg} style={{ color: colors.onSurfaceVariant }}>
+                                    <ThemedText
+                                        variant={TextVariants.label_lg}
+                                        style={{
+                                            color: colors.onSurfaceVariant,
+                                        }}
+                                    >
                                         Price:
                                     </ThemedText>
-                                    <ThemedText variant={TextVariants.subtitle_sm} style={{ color: colors.primary }}>
+                                    <ThemedText
+                                        variant={TextVariants.subtitle_sm}
+                                        style={{ color: colors.primary }}
+                                    >
                                         ${product.price.toFixed(2)}
                                     </ThemedText>
                                 </Surface>
 
                                 {/* Image carousel */}
                                 {product.productImages.length > 0 && (
-                                    <Surface elevation={0} style={styles.carouselWrapper}>
+                                    <Surface
+                                        elevation={0}
+                                        style={styles.carouselWrapper}
+                                    >
                                         <FlatList
                                             data={product.productImages}
                                             keyExtractor={(_, i) => String(i)}
                                             horizontal
                                             pagingEnabled
-                                            showsHorizontalScrollIndicator={false}
+                                            showsHorizontalScrollIndicator={
+                                                false
+                                            }
                                             onMomentumScrollEnd={(e) => {
                                                 setActiveIndex(
-                                                    Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH),
+                                                    Math.round(
+                                                        e.nativeEvent
+                                                            .contentOffset.x /
+                                                            SCREEN_WIDTH,
+                                                    ),
                                                 );
                                             }}
                                             renderItem={({ item }) => (
                                                 <TouchableRipple
-                                                    onPress={() => setFullScreenUri(item)}
-                                                    style={styles.carouselImageWrapper}
+                                                    onPress={() =>
+                                                        setFullScreenUri(item)
+                                                    }
+                                                    style={
+                                                        styles.carouselImageWrapper
+                                                    }
                                                 >
                                                     <Image
                                                         source={{ uri: item }}
-                                                        style={styles.carouselImage}
+                                                        style={
+                                                            styles.carouselImage
+                                                        }
                                                         resizeMode="cover"
                                                     />
                                                 </TouchableRipple>
                                             )}
                                         />
                                         {product.productImages.length > 1 && (
-                                            <Surface elevation={0} style={styles.dots}>
-                                                {product.productImages.map((_, i) => (
-                                                    <View
-                                                        key={i}
-                                                        style={[
-                                                            styles.dot,
-                                                            {
-                                                                backgroundColor:
-                                                                    i === activeIndex
-                                                                        ? colors.primary
-                                                                        : colors.outlineVariant,
-                                                            },
-                                                        ]}
-                                                    />
-                                                ))}
+                                            <Surface
+                                                elevation={0}
+                                                style={styles.dots}
+                                            >
+                                                {product.productImages.map(
+                                                    (_, i) => (
+                                                        <View
+                                                            key={i}
+                                                            style={[
+                                                                styles.dot,
+                                                                {
+                                                                    backgroundColor:
+                                                                        i ===
+                                                                        activeIndex
+                                                                            ? colors.primary
+                                                                            : colors.outlineVariant,
+                                                                },
+                                                            ]}
+                                                        />
+                                                    ),
+                                                )}
                                             </Surface>
                                         )}
                                     </Surface>
@@ -318,35 +395,73 @@ export default function MyProductScreen() {
 
                                 {/* Condition */}
                                 <Surface elevation={0} style={styles.inlineRow}>
-                                    <ThemedText variant={TextVariants.label_lg} style={{ color: colors.onSurfaceVariant }}>
+                                    <ThemedText
+                                        variant={TextVariants.label_lg}
+                                        style={{
+                                            color: colors.onSurfaceVariant,
+                                        }}
+                                    >
                                         Condition:
                                     </ThemedText>
-                                    <ThemedText variant={TextVariants.body_md}>{product.condition}</ThemedText>
+                                    <ThemedText variant={TextVariants.body_md}>
+                                        {product.condition}
+                                    </ThemedText>
                                 </Surface>
 
                                 {/* Category */}
                                 <Surface elevation={0} style={styles.inlineRow}>
-                                    <ThemedText variant={TextVariants.label_lg} style={{ color: colors.onSurfaceVariant }}>
+                                    <ThemedText
+                                        variant={TextVariants.label_lg}
+                                        style={{
+                                            color: colors.onSurfaceVariant,
+                                        }}
+                                    >
                                         Category:
                                     </ThemedText>
-                                    <ThemedText variant={TextVariants.body_md}>{product.category}</ThemedText>
+                                    <ThemedText variant={TextVariants.body_md}>
+                                        {product.category}
+                                    </ThemedText>
                                 </Surface>
 
                                 {/* Contact info */}
                                 {seller?.email ? (
-                                    <Surface elevation={0} style={styles.inlineRow}>
-                                        <ThemedText variant={TextVariants.label_lg} style={{ color: colors.onSurfaceVariant }}>
+                                    <Surface
+                                        elevation={0}
+                                        style={styles.inlineRow}
+                                    >
+                                        <ThemedText
+                                            variant={TextVariants.label_lg}
+                                            style={{
+                                                color: colors.onSurfaceVariant,
+                                            }}
+                                        >
                                             Email:
                                         </ThemedText>
-                                        <ThemedText variant={TextVariants.body_md}>{seller.email}</ThemedText>
+                                        <ThemedText
+                                            variant={TextVariants.body_md}
+                                        >
+                                            {seller.email}
+                                        </ThemedText>
                                     </Surface>
                                 ) : null}
                                 {seller?.mobileNumber ? (
-                                    <Surface elevation={0} style={styles.inlineRow}>
-                                        <ThemedText variant={TextVariants.label_lg} style={{ color: colors.onSurfaceVariant }}>
+                                    <Surface
+                                        elevation={0}
+                                        style={styles.inlineRow}
+                                    >
+                                        <ThemedText
+                                            variant={TextVariants.label_lg}
+                                            style={{
+                                                color: colors.onSurfaceVariant,
+                                            }}
+                                        >
                                             Phone:
                                         </ThemedText>
-                                        <ThemedText variant={TextVariants.body_md}>{seller.mobileNumber}</ThemedText>
+                                        <ThemedText
+                                            variant={TextVariants.body_md}
+                                        >
+                                            {seller.mobileNumber}
+                                        </ThemedText>
                                     </Surface>
                                 ) : null}
 
@@ -358,8 +473,11 @@ export default function MyProductScreen() {
                                         provider={PROVIDER_GOOGLE}
                                         style={styles.locationPreview}
                                         initialRegion={{
-                                            latitude: product.meetupLocation.latitude,
-                                            longitude: product.meetupLocation.longitude,
+                                            latitude:
+                                                product.meetupLocation.latitude,
+                                            longitude:
+                                                product.meetupLocation
+                                                    .longitude,
                                             latitudeDelta: 0.01,
                                             longitudeDelta: 0.01,
                                         }}
@@ -369,7 +487,9 @@ export default function MyProductScreen() {
                                         rotateEnabled={false}
                                         pointerEvents="none"
                                     >
-                                        <Marker coordinate={product.meetupLocation} />
+                                        <Marker
+                                            coordinate={product.meetupLocation}
+                                        />
                                     </MapView>
                                 )}
 
@@ -379,7 +499,9 @@ export default function MyProductScreen() {
                                     onPress={() => setMeetupModalVisible(true)}
                                     style={styles.locationBtn}
                                 >
-                                    {product.meetupLocation ? "Update Meetup Location" : "Set Meetup Location"}
+                                    {product.meetupLocation
+                                        ? "Update Meetup Location"
+                                        : "Set Meetup Location"}
                                 </Button>
 
                                 {product.meetupLocation && (
@@ -388,8 +510,10 @@ export default function MyProductScreen() {
                                         icon="directions"
                                         onPress={() =>
                                             openInMaps(
-                                                product.meetupLocation!.latitude,
-                                                product.meetupLocation!.longitude,
+                                                product.meetupLocation!
+                                                    .latitude,
+                                                product.meetupLocation!
+                                                    .longitude,
                                             )
                                         }
                                     >
@@ -419,12 +543,17 @@ export default function MyProductScreen() {
                             <FlatList
                                 data={product.subscribers}
                                 keyExtractor={(item) => item.id}
-                                renderItem={({ item }) => <SubscriberCard subscriber={item} />}
+                                renderItem={({ item }) => (
+                                    <SubscriberCard subscriber={item} />
+                                )}
                                 contentContainerStyle={styles.subscriberList}
                                 ListEmptyComponent={
                                     <ThemedText
                                         variant={TextVariants.body_md}
-                                        style={[styles.empty, { color: colors.onSurfaceVariant }]}
+                                        style={[
+                                            styles.empty,
+                                            { color: colors.onSurfaceVariant },
+                                        ]}
                                     >
                                         No subscribers yet.
                                     </ThemedText>
@@ -436,7 +565,10 @@ export default function MyProductScreen() {
                 </TabsProvider>
             ) : (
                 <Surface elevation={0} style={styles.loader}>
-                    <ThemedText variant={TextVariants.body_md} style={{ color: colors.onSurfaceVariant }}>
+                    <ThemedText
+                        variant={TextVariants.body_md}
+                        style={{ color: colors.onSurfaceVariant }}
+                    >
                         Product not found.
                     </ThemedText>
                 </Surface>
@@ -445,7 +577,10 @@ export default function MyProductScreen() {
             {/* Full screen image viewer */}
             <Portal>
                 {fullScreenUri && (
-                    <FullScreenImage uri={fullScreenUri} onClose={() => setFullScreenUri(null)} />
+                    <FullScreenImage
+                        uri={fullScreenUri}
+                        onClose={() => setFullScreenUri(null)}
+                    />
                 )}
             </Portal>
 
@@ -497,7 +632,12 @@ const styles = StyleSheet.create({
     carouselWrapper: { marginHorizontal: -16 },
     carouselImageWrapper: { width: SCREEN_WIDTH, height: CAROUSEL_HEIGHT },
     carouselImage: { width: SCREEN_WIDTH, height: CAROUSEL_HEIGHT },
-    dots: { flexDirection: "row", justifyContent: "center", gap: 6, paddingTop: 8 },
+    dots: {
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 6,
+        paddingTop: 8,
+    },
     dot: { width: 7, height: 7, borderRadius: 4 },
     divider: { marginVertical: 4 },
     availabilityBtn: { borderRadius: 0 },

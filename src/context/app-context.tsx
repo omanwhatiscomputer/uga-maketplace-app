@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 
-type UserDTO = {
+type User = {
     id: string;
     firstName: string;
     lastName: string;
@@ -11,7 +11,7 @@ type UserDTO = {
     subscriptions: { id: string }[];
 };
 
-type AppUser = UserDTO & { token: string };
+type AppUser = User & { token: string };
 
 type AppContextType = {
     user: AppUser | null;
@@ -63,4 +63,4 @@ export function useAppContext() {
     return context;
 }
 
-export type { AppUser, UserDTO };
+export type { AppUser, User };

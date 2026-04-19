@@ -1,13 +1,18 @@
 import { getUserById } from "@/api/endpoints/users";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
+import type { User } from "@/context/app-context";
 import { useAppContext } from "@/context/app-context";
-import type { UserDTO } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import { ActivityIndicator, Appbar, Divider, Surface } from "react-native-paper";
+import {
+    ActivityIndicator,
+    Appbar,
+    Divider,
+    Surface,
+} from "react-native-paper";
 
 type FieldRowProps = {
     label: string;
@@ -35,7 +40,7 @@ export default function UserInfoScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const { user } = useAppContext();
 
-    const [seller, setSeller] = useState<UserDTO | null>(null);
+    const [seller, setSeller] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -58,14 +63,21 @@ export default function UserInfoScreen() {
     return (
         <Surface style={styles.screen} elevation={0}>
             <Appbar.Header>
-                <Appbar.Content title="Seller Info" titleStyle={{ fontWeight: "bold" }} />
+                <Appbar.Content
+                    title="Seller Info"
+                    titleStyle={{ fontWeight: "bold" }}
+                />
                 <Appbar.Action icon="close" onPress={() => router.back()} />
             </Appbar.Header>
 
             <Divider />
 
             {loading ? (
-                <ActivityIndicator animating size="large" style={styles.loader} />
+                <ActivityIndicator
+                    animating
+                    size="large"
+                    style={styles.loader}
+                />
             ) : error ? (
                 <Surface elevation={0} style={styles.loader}>
                     <ThemedText
@@ -90,7 +102,10 @@ export default function UserInfoScreen() {
                     {formattedDate && (
                         <>
                             <Divider />
-                            <FieldRow label="Member Since" value={formattedDate} />
+                            <FieldRow
+                                label="Member Since"
+                                value={formattedDate}
+                            />
                         </>
                     )}
                 </ScrollView>

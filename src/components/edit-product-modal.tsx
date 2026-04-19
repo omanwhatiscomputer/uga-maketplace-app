@@ -1,4 +1,4 @@
-import { updateProduct, type ProductDTO } from "@/api/endpoints/products";
+import { updateProduct, type Product } from "@/api/endpoints/products";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, StyleSheet } from "react-native";
@@ -17,17 +17,27 @@ import {
 const MODAL_HEIGHT = Dimensions.get("window").height * 0.88;
 
 const CATEGORIES = [
-    "Electronics", "Clothing", "Books", "Furniture", "Sports",
-    "Toys", "Kitchenwares", "Vehicles", "Music", "Art", "Pets", "Other",
+    "Electronics",
+    "Clothing",
+    "Books",
+    "Furniture",
+    "Sports",
+    "Toys",
+    "Kitchenwares",
+    "Vehicles",
+    "Music",
+    "Art",
+    "Pets",
+    "Other",
 ];
 
 const CONDITIONS = ["Premium", "Excellent", "Good", "Acceptable", "Poor"];
 
 type EditProductModalProps = {
     visible: boolean;
-    product: ProductDTO;
+    product: Product;
     onClose: () => void;
-    onUpdated: (updated: ProductDTO) => void;
+    onUpdated: (updated: Product) => void;
 };
 
 export function EditProductModal({
@@ -56,13 +66,29 @@ export function EditProductModal({
             setCategory(product.category);
             setCondition(product.condition);
             Animated.parallel([
-                Animated.timing(translateY, { toValue: 0, duration: 300, useNativeDriver: true }),
-                Animated.timing(backdropOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+                Animated.timing(translateY, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(backdropOpacity, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
             ]).start();
         } else {
             Animated.parallel([
-                Animated.timing(translateY, { toValue: MODAL_HEIGHT, duration: 300, useNativeDriver: true }),
-                Animated.timing(backdropOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+                Animated.timing(translateY, {
+                    toValue: MODAL_HEIGHT,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(backdropOpacity, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
             ]).start();
         }
     }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -101,10 +127,17 @@ export function EditProductModal({
                 pointerEvents={visible ? "auto" : "none"}
                 style={[
                     StyleSheet.absoluteFill,
-                    { backgroundColor: "rgba(0,0,0,0.5)", opacity: backdropOpacity },
+                    {
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        opacity: backdropOpacity,
+                    },
                 ]}
             >
-                <TouchableRipple style={StyleSheet.absoluteFill} onPress={onClose} borderless>
+                <TouchableRipple
+                    style={StyleSheet.absoluteFill}
+                    onPress={onClose}
+                    borderless
+                >
                     <Surface style={StyleSheet.absoluteFill} elevation={0} />
                 </TouchableRipple>
             </Animated.View>
@@ -115,7 +148,10 @@ export function EditProductModal({
             >
                 <Surface style={styles.surface} elevation={4}>
                     <Surface elevation={0} style={styles.header}>
-                        <Text variant="titleMedium" style={{ flex: 1, color: colors.onSurface }}>
+                        <Text
+                            variant="titleMedium"
+                            style={{ flex: 1, color: colors.onSurface }}
+                        >
                             Edit Listing
                         </Text>
                         <IconButton icon="close" onPress={onClose} />
@@ -126,7 +162,13 @@ export function EditProductModal({
                         keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
                     >
-                        <TextInput mode="flat" label="Title" value={title} onChangeText={setTitle} maxLength={100} />
+                        <TextInput
+                            mode="flat"
+                            label="Title"
+                            value={title}
+                            onChangeText={setTitle}
+                            maxLength={100}
+                        />
                         <TextInput
                             mode="flat"
                             label="Description"
@@ -140,12 +182,17 @@ export function EditProductModal({
                             mode="flat"
                             label="Price ($)"
                             value={price}
-                            onChangeText={(t) => setPrice(t.replace(/[^0-9.]/g, ""))}
+                            onChangeText={(t) =>
+                                setPrice(t.replace(/[^0-9.]/g, ""))
+                            }
                             keyboardType="decimal-pad"
                             left={<TextInput.Affix text="$" />}
                         />
 
-                        <Text variant="labelLarge" style={{ color: colors.onSurfaceVariant }}>
+                        <Text
+                            variant="labelLarge"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
                             Category
                         </Text>
                         <Surface elevation={0} style={styles.chips}>
@@ -153,17 +200,29 @@ export function EditProductModal({
                                 <Chip
                                     key={cat}
                                     selected={category === cat}
-                                    onPress={() => setCategory(category === cat ? "" : cat)}
+                                    onPress={() =>
+                                        setCategory(category === cat ? "" : cat)
+                                    }
                                     showSelectedCheck={false}
                                     selectedColor={colors.onPrimary}
-                                    style={category === cat ? { backgroundColor: colors.primary } : undefined}
+                                    style={
+                                        category === cat
+                                            ? {
+                                                  backgroundColor:
+                                                      colors.primary,
+                                              }
+                                            : undefined
+                                    }
                                 >
                                     {cat}
                                 </Chip>
                             ))}
                         </Surface>
 
-                        <Text variant="labelLarge" style={{ color: colors.onSurfaceVariant }}>
+                        <Text
+                            variant="labelLarge"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
                             Condition
                         </Text>
                         <Surface elevation={0} style={styles.chips}>
@@ -171,10 +230,21 @@ export function EditProductModal({
                                 <Chip
                                     key={cond}
                                     selected={condition === cond}
-                                    onPress={() => setCondition(condition === cond ? "" : cond)}
+                                    onPress={() =>
+                                        setCondition(
+                                            condition === cond ? "" : cond,
+                                        )
+                                    }
                                     showSelectedCheck={false}
                                     selectedColor={colors.onPrimary}
-                                    style={condition === cond ? { backgroundColor: colors.primary } : undefined}
+                                    style={
+                                        condition === cond
+                                            ? {
+                                                  backgroundColor:
+                                                      colors.primary,
+                                              }
+                                            : undefined
+                                    }
                                 >
                                     {cond}
                                 </Chip>
@@ -182,13 +252,21 @@ export function EditProductModal({
                         </Surface>
 
                         {loading ? (
-                            <ActivityIndicator animating size="large" style={{ marginTop: 8 }} />
+                            <ActivityIndicator
+                                animating
+                                size="large"
+                                style={{ marginTop: 8 }}
+                            />
                         ) : (
                             <Button
                                 mode="contained"
                                 onPress={handleSubmit}
                                 disabled={!canSubmit}
-                                style={{ marginTop: 8, marginBottom: 24, borderRadius: 0 }}
+                                style={{
+                                    marginTop: 8,
+                                    marginBottom: 24,
+                                    borderRadius: 0,
+                                }}
                             >
                                 Save Changes
                             </Button>
@@ -207,7 +285,11 @@ export function EditProductModal({
                     alignSelf: "center",
                 }}
                 theme={{ colors: { inverseSurface: colors.onErrorContainer } }}
-                action={{ label: "✕", onPress: () => setError(null), textColor: colors.onErrorContainer }}
+                action={{
+                    label: "✕",
+                    onPress: () => setError(null),
+                    textColor: colors.onErrorContainer,
+                }}
             >
                 <Text style={{ color: colors.onErrorContainer }}>{error}</Text>
             </Snackbar>

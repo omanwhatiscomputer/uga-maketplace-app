@@ -1,6 +1,6 @@
 import { apiClient } from "@/api/client";
 
-type CreateProductDTO = {
+type CreateProduct = {
     productName: string;
     productDescription: string;
     price: number;
@@ -9,7 +9,7 @@ type CreateProductDTO = {
     productImages: string[];
 };
 
-type UpdateProductDTO = {
+type UpdateProduct = {
     productName?: string;
     productDescription?: string;
     price?: number;
@@ -17,7 +17,7 @@ type UpdateProductDTO = {
     condition?: string;
 };
 
-export type UserSummaryDTO = {
+export type UserSummary = {
     id: string;
     firstName: string;
     lastName: string;
@@ -31,7 +31,7 @@ export type MeetupLocation = {
     longitude: number;
 };
 
-export type ProductSummaryDTO = {
+export type ProductSummary = {
     id: string;
     sellerId: string;
     productName: string;
@@ -45,7 +45,7 @@ export type ProductSummaryDTO = {
     meetupLocation?: MeetupLocation | null;
 };
 
-export type ProductDTO = {
+export type Product = {
     id: string;
     sellerId: string;
     sellerName: string;
@@ -58,28 +58,28 @@ export type ProductDTO = {
     category: string;
     condition: string;
     meetupLocation?: MeetupLocation | null;
-    subscribers: UserSummaryDTO[];
-    wishlistedBy: UserSummaryDTO[];
+    subscribers: UserSummary[];
+    wishlistedBy: UserSummary[];
 };
 
-export async function createProduct(data: CreateProductDTO): Promise<void> {
+export async function createProduct(data: CreateProduct): Promise<void> {
     await apiClient.post("/product", data);
 }
 
-export async function getProductById(id: string): Promise<ProductDTO> {
-    const response = await apiClient.get<ProductDTO>(`/product/${id}`);
+export async function getProductById(id: string): Promise<Product> {
+    const response = await apiClient.get<Product>(`/product/${id}`);
     return response.data;
 }
 
-export async function getAllProducts(): Promise<ProductSummaryDTO[]> {
-    const response = await apiClient.get<ProductSummaryDTO[]>("/product");
+export async function getAllProducts(): Promise<ProductSummary[]> {
+    const response = await apiClient.get<ProductSummary[]>("/product");
     return response.data;
 }
 
 export async function getProductsByCategory(
     category: string,
-): Promise<ProductSummaryDTO[]> {
-    const response = await apiClient.get<ProductSummaryDTO[]>(
+): Promise<ProductSummary[]> {
+    const response = await apiClient.get<ProductSummary[]>(
         `/product/category/${encodeURIComponent(category)}`,
     );
     return response.data;
@@ -87,14 +87,14 @@ export async function getProductsByCategory(
 
 export async function updateProduct(
     id: string,
-    data: UpdateProductDTO,
-): Promise<ProductDTO> {
-    const response = await apiClient.patch<ProductDTO>(`/product/${id}`, data);
+    data: UpdateProduct,
+): Promise<Product> {
+    const response = await apiClient.patch<Product>(`/product/${id}`, data);
     return response.data;
 }
 
-export async function toggleAvailability(id: string): Promise<ProductDTO> {
-    const response = await apiClient.patch<ProductDTO>(
+export async function toggleAvailability(id: string): Promise<Product> {
+    const response = await apiClient.patch<Product>(
         `/product/${id}/availability`,
     );
     return response.data;
@@ -108,8 +108,8 @@ export async function updateProductLocation(
     id: string,
     latitude: number,
     longitude: number,
-): Promise<ProductDTO> {
-    const response = await apiClient.patch<ProductDTO>(`/product/${id}/location`, {
+): Promise<Product> {
+    const response = await apiClient.patch<Product>(`/product/${id}/location`, {
         latitude,
         longitude,
     });

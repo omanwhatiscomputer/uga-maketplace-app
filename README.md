@@ -52,7 +52,7 @@ To learn more about developing your project with Expo, look at the following res
 
 # CSCI 4050/6050: SWE
 
-## Dependencies:
+## Dependencies
 
 ```
 java 21.0.2-tem
@@ -76,7 +76,7 @@ ios:
 
 ## Known compatibility issues and pitfalls
 
-- Compile using `java 21.0.2-tem `
+- Compile using `java 21.0.2-tem`
 
 ```bash
 sdk install java 21.0.2-tem   # install Temurin 21
@@ -96,4 +96,10 @@ $ ./gradlew signingReport
 <application
     android:usesCleartextTraffic="true"
     ...>
+```
+
+## Important flag
+
+```
+%%%%%%%%%%%%%%%% VALIDATE UGA EMAIL DOMAIN %%%%%%%%%%%%%%%%
 ```

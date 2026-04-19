@@ -1,4 +1,4 @@
-import { getAllProducts, type ProductSummaryDTO } from "@/api/endpoints/products";
+import { getAllProducts, type ProductSummary } from "@/api/endpoints/products";
 import {
     addToWishlist,
     removeFromWishlist,
@@ -19,26 +19,32 @@ export default function ExploreScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
     const navigation = useNavigation();
-    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
+    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } =
+        useAppContext();
 
-    const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
+    const [products, setProducts] = useState<ProductSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchProducts = useCallback(async (isRefresh = false) => {
-        if (isRefresh) setRefreshing(true);
-        else setLoading(true);
-        try {
-            const data = await getAllProducts();
-            setProducts([...data].reverse().filter((p) => p.sellerId !== user?.id));
-        } catch {
-            setError("Failed to load listings.");
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    }, [user?.id]);
+    const fetchProducts = useCallback(
+        async (isRefresh = false) => {
+            if (isRefresh) setRefreshing(true);
+            else setLoading(true);
+            try {
+                const data = await getAllProducts();
+                setProducts(
+                    [...data].reverse().filter((p) => p.sellerId !== user?.id),
+                );
+            } catch {
+                setError("Failed to load listings.");
+            } finally {
+                setLoading(false);
+                setRefreshing(false);
+            }
+        },
+        [user?.id],
+    );
 
     useEffect(() => {
         fetchProducts();
@@ -92,7 +98,7 @@ export default function ExploreScreen() {
         }
     };
 
-    const handleProductPress = (product: ProductSummaryDTO) => {
+    const handleProductPress = (product: ProductSummary) => {
         router.push({
             pathname: "/(protected)/product/[id]",
             params: {

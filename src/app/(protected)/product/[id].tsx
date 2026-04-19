@@ -1,7 +1,7 @@
 import {
     getProductById,
     updateProductLocation,
-    type ProductDTO,
+    type Product,
 } from "@/api/endpoints/products";
 import {
     addToWishlist,
@@ -13,7 +13,7 @@ import {
 import { MeetupLocationModal } from "@/components/meetup-location-modal";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
-import type { UserDTO } from "@/context/app-context";
+import type { User } from "@/context/app-context";
 import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -107,10 +107,11 @@ export default function ProductDetailScreen() {
         id: string;
         productName: string;
     }>();
-    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
+    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } =
+        useAppContext();
 
-    const [product, setProduct] = useState<ProductDTO | null>(null);
-    const [seller, setSeller] = useState<UserDTO | null>(null);
+    const [product, setProduct] = useState<Product | null>(null);
+    const [seller, setSeller] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
     const [fullScreenUri, setFullScreenUri] = useState<string | null>(null);
@@ -318,8 +319,12 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.actionButtons}>
                             <Button
                                 mode={isWishlisted ? "contained" : "outlined"}
-                                buttonColor={isWishlisted ? colors.primary : undefined}
-                                textColor={isWishlisted ? colors.onPrimary : undefined}
+                                buttonColor={
+                                    isWishlisted ? colors.primary : undefined
+                                }
+                                textColor={
+                                    isWishlisted ? colors.onPrimary : undefined
+                                }
                                 icon={isWishlisted ? "heart" : "heart-outline"}
                                 onPress={handleToggleWishlist}
                                 style={styles.actionBtn}
@@ -328,8 +333,12 @@ export default function ProductDetailScreen() {
                             </Button>
                             <Button
                                 mode={isSubscribed ? "contained" : "outlined"}
-                                buttonColor={isSubscribed ? colors.primary : undefined}
-                                textColor={isSubscribed ? colors.onPrimary : undefined}
+                                buttonColor={
+                                    isSubscribed ? colors.primary : undefined
+                                }
+                                textColor={
+                                    isSubscribed ? colors.onPrimary : undefined
+                                }
                                 icon={isSubscribed ? "cart" : "cart-outline"}
                                 onPress={handleToggleSubscribe}
                                 style={styles.actionBtn}

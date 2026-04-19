@@ -1,4 +1,4 @@
-import { type ProductSummaryDTO } from "@/api/endpoints/products";
+import { type ProductSummary } from "@/api/endpoints/products";
 import { getUserById, unsubscribeFromProduct } from "@/api/endpoints/users";
 import { ProductCard } from "@/components/product-card";
 import { ThemedText } from "@/components/themed-text";
@@ -9,7 +9,14 @@ import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import { ActivityIndicator, Icon, Snackbar, Surface, Text, TouchableRipple } from "react-native-paper";
+import {
+    ActivityIndicator,
+    Icon,
+    Snackbar,
+    Surface,
+    Text,
+    TouchableRipple,
+} from "react-native-paper";
 
 function RemoveAction({ onPress }: { onPress: () => void }) {
     const { colors } = useAppTheme();
@@ -19,7 +26,11 @@ function RemoveAction({ onPress }: { onPress: () => void }) {
                 elevation={0}
                 style={[styles.removeInner, { backgroundColor: colors.error }]}
             >
-                <Icon source="trash-can-outline" size={24} color={colors.onError} />
+                <Icon
+                    source="trash-can-outline"
+                    size={24}
+                    color={colors.onError}
+                />
                 <Text variant="labelMedium" style={{ color: colors.onError }}>
                     Remove
                 </Text>
@@ -34,26 +45,29 @@ export default function SubscribedScreen() {
     const navigation = useNavigation();
     const { user, setSubscribed } = useAppContext();
 
-    const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
+    const [products, setProducts] = useState<ProductSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const swipeableRefs = useRef<Map<string, Swipeable>>(new Map());
 
-    const fetchSubscriptions = useCallback(async (isRefresh = false) => {
-        if (!user) return;
-        if (isRefresh) setRefreshing(true);
-        else setLoading(true);
-        try {
-            const data = await getUserById(user.id, user.token);
-            setProducts(data.subscriptions as ProductSummaryDTO[]);
-        } catch {
-            setError("Failed to load subscriptions.");
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    }, [user]);
+    const fetchSubscriptions = useCallback(
+        async (isRefresh = false) => {
+            if (!user) return;
+            if (isRefresh) setRefreshing(true);
+            else setLoading(true);
+            try {
+                const data = await getUserById(user.id, user.token);
+                setProducts(data.subscriptions as ProductSummary[]);
+            } catch {
+                setError("Failed to load subscriptions.");
+            } finally {
+                setLoading(false);
+                setRefreshing(false);
+            }
+        },
+        [user],
+    );
 
     useEffect(() => {
         fetchSubscriptions();
@@ -79,7 +93,7 @@ export default function SubscribedScreen() {
         }
     };
 
-    const handleProductPress = (product: ProductSummaryDTO) => {
+    const handleProductPress = (product: ProductSummary) => {
         router.push({
             pathname: "/(protected)/product/[id]",
             params: {
@@ -97,7 +111,11 @@ export default function SubscribedScreen() {
     return (
         <Surface style={styles.screen} elevation={0}>
             {loading ? (
-                <ActivityIndicator animating size="large" style={styles.loader} />
+                <ActivityIndicator
+                    animating
+                    size="large"
+                    style={styles.loader}
+                />
             ) : (
                 <FlatList
                     data={products}
@@ -105,11 +123,14 @@ export default function SubscribedScreen() {
                     renderItem={({ item }) => (
                         <Swipeable
                             ref={(ref) => {
-                                if (ref) swipeableRefs.current.set(item.id, ref);
+                                if (ref)
+                                    swipeableRefs.current.set(item.id, ref);
                                 else swipeableRefs.current.delete(item.id);
                             }}
                             renderRightActions={() => (
-                                <RemoveAction onPress={() => handleRemove(item.id)} />
+                                <RemoveAction
+                                    onPress={() => handleRemove(item.id)}
+                                />
                             )}
                             overshootRight={false}
                         >
@@ -135,7 +156,10 @@ export default function SubscribedScreen() {
                     ListEmptyComponent={
                         <ThemedText
                             variant={TextVariants.body_md}
-                            style={[styles.empty, { color: colors.onSurfaceVariant }]}
+                            style={[
+                                styles.empty,
+                                { color: colors.onSurfaceVariant },
+                            ]}
                         >
                             You have no subscriptions.
                         </ThemedText>

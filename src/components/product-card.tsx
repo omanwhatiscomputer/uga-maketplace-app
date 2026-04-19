@@ -1,4 +1,4 @@
-import type { ProductSummaryDTO } from "@/api/endpoints/products";
+import type { ProductSummary } from "@/api/endpoints/products";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppTheme } from "@/hooks/use-app-theme";
@@ -6,7 +6,7 @@ import { Image, StyleSheet } from "react-native";
 import { Button, Card, Surface } from "react-native-paper";
 
 type ProductCardProps = {
-    product: ProductSummaryDTO;
+    product: ProductSummary;
     isWishlisted: boolean;
     isSubscribed: boolean;
     onPress: () => void;

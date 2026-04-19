@@ -1,4 +1,8 @@
-import { deleteProduct, getAllProducts, type ProductSummaryDTO } from "@/api/endpoints/products";
+import {
+    deleteProduct,
+    getAllProducts,
+    type ProductSummary,
+} from "@/api/endpoints/products";
 import { ProductCard } from "@/components/product-card";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
@@ -26,7 +30,11 @@ function DeleteAction({ onPress }: { onPress: () => void }) {
                 elevation={0}
                 style={[styles.deleteInner, { backgroundColor: colors.error }]}
             >
-                <Icon source="trash-can-outline" size={24} color={colors.onError} />
+                <Icon
+                    source="trash-can-outline"
+                    size={24}
+                    color={colors.onError}
+                />
                 <Text variant="labelMedium" style={{ color: colors.onError }}>
                     Delete
                 </Text>
@@ -39,26 +47,29 @@ export default function ActivePostsScreen() {
     const { colors } = useAppTheme();
     const { user } = useAppContext();
 
-    const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
+    const [products, setProducts] = useState<ProductSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const swipeableRefs = useRef<Map<string, Swipeable>>(new Map());
 
-    const fetchPosts = useCallback(async (isRefresh = false) => {
-        if (!user) return;
-        if (isRefresh) setRefreshing(true);
-        else setLoading(true);
-        try {
-            const data = await getAllProducts();
-            setProducts(data.filter((p) => p.sellerId === user.id));
-        } catch {
-            setError("Failed to load posts.");
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    }, [user]);
+    const fetchPosts = useCallback(
+        async (isRefresh = false) => {
+            if (!user) return;
+            if (isRefresh) setRefreshing(true);
+            else setLoading(true);
+            try {
+                const data = await getAllProducts();
+                setProducts(data.filter((p) => p.sellerId === user.id));
+            } catch {
+                setError("Failed to load posts.");
+            } finally {
+                setLoading(false);
+                setRefreshing(false);
+            }
+        },
+        [user],
+    );
 
     useFocusEffect(fetchPosts);
 
@@ -73,7 +84,7 @@ export default function ActivePostsScreen() {
         }
     };
 
-    const handleProductPress = (product: ProductSummaryDTO) => {
+    const handleProductPress = (product: ProductSummary) => {
         router.push({
             pathname: "/(protected)/my-product/[id]",
             params: { id: product.id, productName: product.productName },
@@ -83,12 +94,19 @@ export default function ActivePostsScreen() {
     return (
         <Surface style={styles.screen} elevation={0}>
             <Appbar.Header>
-                <Appbar.BackAction onPress={router.back} color={colors.primary} />
+                <Appbar.BackAction
+                    onPress={router.back}
+                    color={colors.primary}
+                />
                 <Appbar.Content title="My Active Posts" />
             </Appbar.Header>
 
             {loading ? (
-                <ActivityIndicator animating size="large" style={styles.loader} />
+                <ActivityIndicator
+                    animating
+                    size="large"
+                    style={styles.loader}
+                />
             ) : (
                 <FlatList
                     data={products}
@@ -96,11 +114,14 @@ export default function ActivePostsScreen() {
                     renderItem={({ item }) => (
                         <Swipeable
                             ref={(ref) => {
-                                if (ref) swipeableRefs.current.set(item.id, ref);
+                                if (ref)
+                                    swipeableRefs.current.set(item.id, ref);
                                 else swipeableRefs.current.delete(item.id);
                             }}
                             renderRightActions={() => (
-                                <DeleteAction onPress={() => handleDelete(item.id)} />
+                                <DeleteAction
+                                    onPress={() => handleDelete(item.id)}
+                                />
                             )}
                             overshootRight={false}
                         >
@@ -126,7 +147,10 @@ export default function ActivePostsScreen() {
                     ListEmptyComponent={
                         <ThemedText
                             variant={TextVariants.body_md}
-                            style={[styles.empty, { color: colors.onSurfaceVariant }]}
+                            style={[
+                                styles.empty,
+                                { color: colors.onSurfaceVariant },
+                            ]}
                         >
                             You have no active posts.
                         </ThemedText>

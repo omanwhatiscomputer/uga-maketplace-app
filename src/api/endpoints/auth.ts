@@ -1,9 +1,9 @@
 import { apiClient } from "@/api/client";
-import type { AppUser, UserDTO } from "@/context/app-context";
+import type { AppUser, User } from "@/context/app-context";
 
 type GoogleSignInResponse = {
     token: string;
-    user: UserDTO;
+    user: User;
 };
 
 type GoogleSignUpCheckResponse = {
@@ -14,10 +14,10 @@ type GoogleSignUpCheckResponse = {
 
 type CreateAccountResponse = {
     token: string;
-    user: UserDTO;
+    user: User;
 };
 
-type CreateAccountDTO = {
+type CreateAccount = {
     email: string;
     firstName: string;
     lastName: string;
@@ -47,7 +47,7 @@ export async function signInWithGoogle(idToken: string): Promise<AppUser> {
 }
 
 // Creates a new account with the collected user data
-export async function createAccount(data: CreateAccountDTO): Promise<AppUser> {
+export async function createAccount(data: CreateAccount): Promise<AppUser> {
     const response = await apiClient.post<CreateAccountResponse>(
         "/auth/create-account",
         data,

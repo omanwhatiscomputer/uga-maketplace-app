@@ -1,22 +1,24 @@
 import { apiClient } from "@/api/client";
-import type { UserSummaryDTO } from "./products";
+import type { UserSummary } from "./products";
 
-export type TransactionDTO = {
+export type Transaction = {
     id: string;
     productId: string;
     productName: string;
     price: number;
     date: string;
-    seller: UserSummaryDTO;
-    buyer: UserSummaryDTO;
+    seller: UserSummary;
+    buyer: UserSummary;
 };
 
-export async function getSalesHistory(): Promise<TransactionDTO[]> {
-    const { data } = await apiClient.get<TransactionDTO[]>("/transaction/sales");
+export async function getSalesHistory(): Promise<Transaction[]> {
+    const { data } = await apiClient.get<Transaction[]>("/transaction/sales");
     return data;
 }
 
-export async function getPurchaseHistory(): Promise<TransactionDTO[]> {
-    const { data } = await apiClient.get<TransactionDTO[]>("/transaction/purchases");
+export async function getPurchaseHistory(): Promise<Transaction[]> {
+    const { data } = await apiClient.get<Transaction[]>(
+        "/transaction/purchases",
+    );
     return data;
 }

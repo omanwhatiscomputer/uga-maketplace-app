@@ -1,6 +1,6 @@
 import {
     getProductsByCategory,
-    type ProductSummaryDTO,
+    type ProductSummary,
 } from "@/api/endpoints/products";
 import {
     addToWishlist,
@@ -45,27 +45,33 @@ export default function CategoryScreen() {
     const { colors } = useAppTheme();
     const router = useRouter();
     const navigation = useNavigation();
-    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } = useAppContext();
+    const { user, wishlisted, setWishlisted, subscribed, setSubscribed } =
+        useAppContext();
 
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [products, setProducts] = useState<ProductSummaryDTO[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(
+        null,
+    );
+    const [products, setProducts] = useState<ProductSummary[]>([]);
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchByCategory = useCallback(async (category: string, isRefresh = false) => {
-        if (isRefresh) setRefreshing(true);
-        else setLoading(true);
-        try {
-            const data = await getProductsByCategory(category);
-            setProducts(data.filter((p) => p.sellerId !== user?.id));
-        } catch {
-            setError("Failed to load products.");
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    }, [user?.id]);
+    const fetchByCategory = useCallback(
+        async (category: string, isRefresh = false) => {
+            if (isRefresh) setRefreshing(true);
+            else setLoading(true);
+            try {
+                const data = await getProductsByCategory(category);
+                setProducts(data.filter((p) => p.sellerId !== user?.id));
+            } catch {
+                setError("Failed to load products.");
+            } finally {
+                setLoading(false);
+                setRefreshing(false);
+            }
+        },
+        [user?.id],
+    );
 
     useEffect(() => {
         const unsubscribe = navigation.addListener("tabPress" as any, () => {
@@ -128,7 +134,7 @@ export default function CategoryScreen() {
         }
     };
 
-    const handleProductPress = (product: ProductSummaryDTO) => {
+    const handleProductPress = (product: ProductSummary) => {
         router.push({
             pathname: "/(protected)/product/[id]",
             params: {
@@ -200,13 +206,20 @@ export default function CategoryScreen() {
                                 isWishlisted={wishlisted.has(item.id)}
                                 isSubscribed={subscribed.has(item.id)}
                                 onPress={() => handleProductPress(item)}
-                                onToggleWishlist={() => handleToggleWishlist(item.id)}
-                                onToggleSubscribe={() => handleToggleSubscribe(item.id)}
+                                onToggleWishlist={() =>
+                                    handleToggleWishlist(item.id)
+                                }
+                                onToggleSubscribe={() =>
+                                    handleToggleSubscribe(item.id)
+                                }
                             />
                         )}
                         ListHeaderComponent={
                             <>
-                                <Surface elevation={0} style={styles.drillHeader}>
+                                <Surface
+                                    elevation={0}
+                                    style={styles.drillHeader}
+                                >
                                     <IconButton
                                         icon="arrow-left"
                                         onPress={handleBack}
@@ -234,7 +247,9 @@ export default function CategoryScreen() {
                             </ThemedText>
                         }
                         contentContainerStyle={styles.list}
-                        onRefresh={() => fetchByCategory(selectedCategory, true)}
+                        onRefresh={() =>
+                            fetchByCategory(selectedCategory, true)
+                        }
                         refreshing={refreshing}
                         showsVerticalScrollIndicator={false}
                     />

@@ -1,4 +1,7 @@
-import { getSalesHistory, type TransactionDTO } from "@/api/endpoints/transactions";
+import {
+    getSalesHistory,
+    type Transaction,
+} from "@/api/endpoints/transactions";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
 import { useAppContext } from "@/context/app-context";
@@ -16,7 +19,7 @@ import {
     Text,
 } from "react-native-paper";
 
-function TransactionCard({ record }: { record: TransactionDTO }) {
+function TransactionCard({ record }: { record: Transaction }) {
     const { colors } = useAppTheme();
     const { buyer } = record;
 
@@ -30,18 +33,30 @@ function TransactionCard({ record }: { record: TransactionDTO }) {
                     color={colors.onPrimary}
                 />
                 <Surface elevation={0} style={styles.info}>
-                    <Text variant="titleSmall" style={{ color: colors.onSurface }}>
+                    <Text
+                        variant="titleSmall"
+                        style={{ color: colors.onSurface }}
+                    >
                         {buyer.firstName} {buyer.lastName}
                     </Text>
                     {buyer.mobileNumber ? (
-                        <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                        <Text
+                            variant="bodySmall"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
                             {buyer.mobileNumber}
                         </Text>
                     ) : null}
-                    <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                    <Text
+                        variant="bodySmall"
+                        style={{ color: colors.onSurfaceVariant }}
+                    >
                         {record.productName}
                     </Text>
-                    <Text variant="titleSmall" style={{ color: colors.primary, marginTop: 2 }}>
+                    <Text
+                        variant="titleSmall"
+                        style={{ color: colors.primary, marginTop: 2 }}
+                    >
                         ${record.price.toFixed(2)}
                     </Text>
                 </Surface>
@@ -54,7 +69,7 @@ export default function TransactionHistoryScreen() {
     const { colors } = useAppTheme();
     const { user } = useAppContext();
 
-    const [records, setRecords] = useState<TransactionDTO[]>([]);
+    const [records, setRecords] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchTransactions = useCallback(async () => {
@@ -75,14 +90,21 @@ export default function TransactionHistoryScreen() {
     return (
         <Surface style={styles.screen} elevation={0}>
             <Appbar.Header>
-                <Appbar.BackAction onPress={router.back} color={colors.primary} />
+                <Appbar.BackAction
+                    onPress={router.back}
+                    color={colors.primary}
+                />
                 <Appbar.Content title="Transaction History" />
             </Appbar.Header>
 
             <Divider />
 
             {loading ? (
-                <ActivityIndicator animating size="large" style={styles.loader} />
+                <ActivityIndicator
+                    animating
+                    size="large"
+                    style={styles.loader}
+                />
             ) : (
                 <FlatList
                     data={records}
@@ -99,7 +121,10 @@ export default function TransactionHistoryScreen() {
                     ListEmptyComponent={
                         <ThemedText
                             variant={TextVariants.body_md}
-                            style={[styles.empty, { color: colors.onSurfaceVariant }]}
+                            style={[
+                                styles.empty,
+                                { color: colors.onSurfaceVariant },
+                            ]}
                         >
                             No transactions yet.
                         </ThemedText>

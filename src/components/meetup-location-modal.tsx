@@ -17,6 +17,7 @@ import MapView, {
 import {
     Button,
     IconButton,
+    Snackbar,
     Surface,
     Text,
     TouchableRipple,
@@ -58,6 +59,7 @@ export function MeetupLocationModal({
     const translateY = useRef(new Animated.Value(MODAL_HEIGHT)).current;
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     const [marker, setMarker] = useState<LatLng | null>(null);
+    const [locationError, setLocationError] = useState<string | null>(null);
 
     useEffect(() => {
         if (visible) {
@@ -91,18 +93,38 @@ export function MeetupLocationModal({
     }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleMyLocation = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") return;
-        const loc = await Location.getCurrentPositionAsync({});
-        const coords = {
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-        };
-        mapRef.current?.animateToRegion(
-            { ...coords, latitudeDelta: 0.01, longitudeDelta: 0.01 },
-            500,
-        );
-        setMarker(coords);
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                setLocationError("Location permission was not granted.");
+                return;
+            }
+            const loc =
+                (await Location.getLastKnownPositionAsync()) ??
+                (await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Low,
+                }));
+            if (!loc) {
+                setLocationError("Could not get current location.");
+                return;
+            }
+            const coords = {
+                latitude: loc.coords.latitude,
+                longitude: loc.coords.longitude,
+            };
+            mapRef.current?.animateToRegion(
+                { ...coords, latitudeDelta: 0.01, longitudeDelta: 0.01 },
+                500,
+            );
+            setMarker(coords);
+        } catch (e: any) {
+            const servicesEnabled = await Location.hasServicesEnabledAsync();
+            if (!servicesEnabled) {
+                setLocationError("Turn on Location in Android Settings or the quick-settings panel.");
+            } else {
+                setLocationError(e?.message ?? "Could not get location.");
+            }
+        }
     };
 
     const handleConfirm = () => {
@@ -264,6 +286,24 @@ export function MeetupLocationModal({
                     </Surface>
                 </Surface>
             </Animated.View>
+            <Snackbar
+                visible={!!locationError}
+                onDismiss={() => setLocationError(null)}
+                style={{
+                    borderRadius: 36,
+                    backgroundColor: colors.errorContainer,
+                    width: "90%",
+                    alignSelf: "center",
+                }}
+                theme={{ colors: { inverseSurface: colors.onErrorContainer } }}
+                action={{
+                    label: "✕",
+                    onPress: () => setLocationError(null),
+                    textColor: colors.onErrorContainer,
+                }}
+            >
+                <Text style={{ color: colors.onErrorContainer }}>{locationError}</Text>
+            </Snackbar>
         </>
     );
 }
