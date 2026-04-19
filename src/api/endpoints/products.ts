@@ -9,6 +9,11 @@ type CreateProductDTO = {
     productImages: string[];
 };
 
+export type MeetupLocation = {
+    latitude: number;
+    longitude: number;
+};
+
 export type ProductSummaryDTO = {
     id: string;
     productName: string;
@@ -19,6 +24,7 @@ export type ProductSummaryDTO = {
     isAvailable: boolean;
     productImages: string[];
     dateCreated: string;
+    meetupLocation?: MeetupLocation | null;
 };
 
 export type ProductDTO = {
@@ -33,6 +39,7 @@ export type ProductDTO = {
     isAvailable: boolean;
     category: string;
     condition: string;
+    meetupLocation?: MeetupLocation | null;
 };
 
 export async function createProduct(data: CreateProductDTO): Promise<void> {
@@ -55,5 +62,17 @@ export async function getProductsByCategory(
     const response = await apiClient.get<ProductSummaryDTO[]>(
         `/product/category/${encodeURIComponent(category)}`,
     );
+    return response.data;
+}
+
+export async function updateProductLocation(
+    id: string,
+    latitude: number,
+    longitude: number,
+): Promise<ProductDTO> {
+    const response = await apiClient.patch<ProductDTO>(`/product/${id}/location`, {
+        latitude,
+        longitude,
+    });
     return response.data;
 }

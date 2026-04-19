@@ -1,34 +1,55 @@
-import { getProductById, type ProductDTO } from "@/api/endpoints/products";
+import {
+    getProductById,
+    updateProductLocation,
+    type ProductDTO,
+} from "@/api/endpoints/products";
 import { getUserById } from "@/api/endpoints/users";
+import { MeetupLocationModal } from "@/components/meetup-location-modal";
 import { ThemedText } from "@/components/themed-text";
 import { TextVariants } from "@/constants/typography";
-import { useAppContext } from "@/context/app-context";
 import type { UserDTO } from "@/context/app-context";
+import { useAppContext } from "@/context/app-context";
 import { useAppTheme } from "@/hooks/use-app-theme";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
-} from "react-native-reanimated";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, View } from "react-native";
+import {
+    Dimensions,
+    FlatList,
+    Image,
+    Linking,
+    ScrollView,
+    StyleSheet,
+    View,
+} from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import {
     ActivityIndicator,
     Appbar,
+    Button,
     Divider,
     IconButton,
     Portal,
     Surface,
     TouchableRipple,
 } from "react-native-paper";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const CAROUSEL_HEIGHT = 260;
 
-function FullScreenImage({ uri, onClose }: { uri: string; onClose: () => void }) {
+function FullScreenImage({
+    uri,
+    onClose,
+}: {
+    uri: string;
+    onClose: () => void;
+}) {
     const scale = useSharedValue(1);
     const savedScale = useSharedValue(1);
 
@@ -87,6 +108,7 @@ export default function ProductDetailScreen() {
     const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
     const [fullScreenUri, setFullScreenUri] = useState<string | null>(null);
+    const [meetupModalVisible, setMeetupModalVisible] = useState(false);
 
     useEffect(() => {
         getProductById(id)
@@ -113,6 +135,31 @@ export default function ProductDetailScreen() {
         } as any);
     };
 
+    const handleLocationConfirm = async (location: {
+        latitude: number;
+        longitude: number;
+    }) => {
+        if (!product) return;
+        try {
+            const updated = await updateProductLocation(
+                product.id,
+                location.latitude,
+                location.longitude,
+            );
+            setProduct(updated);
+        } catch {
+            // silently fail — location update failed
+        }
+    };
+
+    const openInMaps = (lat: number, lng: number) => {
+        Linking.openURL(
+            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+        );
+    };
+
+    const isSeller = !!user && !!product && product.sellerId === user.id;
+
     return (
         <Surface style={styles.screen} elevation={0}>
             <Appbar.Header>
@@ -126,7 +173,11 @@ export default function ProductDetailScreen() {
             <Divider />
 
             {loading ? (
-                <ActivityIndicator animating size="large" style={styles.loader} />
+                <ActivityIndicator
+                    animating
+                    size="large"
+                    style={styles.loader}
+                />
             ) : product ? (
                 <ScrollView
                     contentContainerStyle={styles.content}
@@ -175,7 +226,8 @@ export default function ProductDetailScreen() {
                                 onMomentumScrollEnd={(e) => {
                                     setActiveIndex(
                                         Math.round(
-                                            e.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+                                            e.nativeEvent.contentOffset.x /
+                                                SCREEN_WIDTH,
                                         ),
                                     );
                                 }}
@@ -291,6 +343,56 @@ export default function ProductDetailScreen() {
                             </ThemedText>
                         </Surface>
                     ) : null}
+
+                    <Divider style={styles.divider} />
+
+                    {/* Meetup location */}
+                    {product.meetupLocation && (
+                        <MapView
+                            provider={PROVIDER_GOOGLE}
+                            style={styles.locationPreview}
+                            initialRegion={{
+                                latitude: product.meetupLocation.latitude,
+                                longitude: product.meetupLocation.longitude,
+                                latitudeDelta: 0.01,
+                                longitudeDelta: 0.01,
+                            }}
+                            scrollEnabled={false}
+                            zoomEnabled={false}
+                            pitchEnabled={false}
+                            rotateEnabled={false}
+                            pointerEvents="none"
+                        >
+                            <Marker coordinate={product.meetupLocation} />
+                        </MapView>
+                    )}
+
+                    {isSeller ? (
+                        <Button
+                            mode="outlined"
+                            icon="map-marker"
+                            onPress={() => setMeetupModalVisible(true)}
+                            style={styles.locationBtn}
+                        >
+                            {product.meetupLocation
+                                ? "Update Meetup Location"
+                                : "Set Meetup Location"}
+                        </Button>
+                    ) : product.meetupLocation ? (
+                        <Button
+                            mode="contained"
+                            icon="directions"
+                            onPress={() =>
+                                openInMaps(
+                                    product.meetupLocation!.latitude,
+                                    product.meetupLocation!.longitude,
+                                )
+                            }
+                            style={styles.locationBtn}
+                        >
+                            Open in Google Maps
+                        </Button>
+                    ) : null}
                 </ScrollView>
             ) : (
                 <Surface elevation={0} style={styles.loader}>
@@ -312,12 +414,24 @@ export default function ProductDetailScreen() {
                     />
                 )}
             </Portal>
+
+            {/* Meetup location modal */}
+            {meetupModalVisible && (
+                <Portal>
+                    <MeetupLocationModal
+                        visible={meetupModalVisible}
+                        initialLocation={product?.meetupLocation}
+                        onClose={() => setMeetupModalVisible(false)}
+                        onConfirm={handleLocationConfirm}
+                    />
+                </Portal>
+            )}
         </Surface>
     );
 }
 
 const styles = StyleSheet.create({
-    screen: { flex: 1 },
+    screen: { flex: 1, paddingBottom: 16 },
     loader: {
         flex: 1,
         justifyContent: "center",
@@ -359,6 +473,15 @@ const styles = StyleSheet.create({
     },
     divider: {
         marginVertical: 4,
+    },
+    locationPreview: {
+        height: 180,
+        marginHorizontal: -16,
+        borderRadius: 0,
+    },
+    locationBtn: {
+        borderRadius: 0,
+        marginBottom: 30,
     },
     fullScreenOverlay: {
         position: "absolute",
