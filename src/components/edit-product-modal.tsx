@@ -52,7 +52,7 @@ export function EditProductModal({
 
     const [title, setTitle] = useState(product.productName);
     const [description, setDescription] = useState(product.productDescription);
-    const [price, setPrice] = useState(String(product.price));
+    const [price, setPrice] = useState(product.price.toFixed(2));
     const [category, setCategory] = useState(product.category);
     const [condition, setCondition] = useState(product.condition);
     const [loading, setLoading] = useState(false);
@@ -62,7 +62,7 @@ export function EditProductModal({
         if (visible) {
             setTitle(product.productName);
             setDescription(product.productDescription);
-            setPrice(String(product.price));
+            setPrice(product.price.toFixed(2));
             setCategory(product.category);
             setCondition(product.condition);
             Animated.parallel([
@@ -185,6 +185,11 @@ export function EditProductModal({
                             onChangeText={(t) =>
                                 setPrice(t.replace(/[^0-9.]/g, ""))
                             }
+                            onBlur={() => {
+                                const parsed = parseFloat(price);
+                                if (!isNaN(parsed)) setPrice(parsed.toFixed(2));
+                            }}
+                            placeholder="0.00"
                             keyboardType="decimal-pad"
                             left={<TextInput.Affix text="$" />}
                         />

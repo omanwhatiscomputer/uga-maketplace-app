@@ -299,6 +299,11 @@ export function CreatePostModal({
                             onChangeText={(t) =>
                                 setPrice(t.replace(/[^0-9.]/g, ""))
                             }
+                            onBlur={() => {
+                                const parsed = parseFloat(price);
+                                if (!isNaN(parsed)) setPrice(parsed.toFixed(2));
+                            }}
+                            placeholder="0.00"
                             keyboardType="decimal-pad"
                             left={<TextInput.Affix text="$" />}
                         />
