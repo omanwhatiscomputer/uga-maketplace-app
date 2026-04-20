@@ -146,6 +146,7 @@ export default function TabsLayout() {
                         backgroundColor: colors.elevation.level2,
                         borderTopColor: colors.outlineVariant,
                     },
+                    sceneStyle: { backgroundColor: colors.background },
                     header: () => (
                         <Appbar.Header>
                             <Appbar.Action icon="menu" onPress={openDrawer} />

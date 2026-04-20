@@ -260,6 +260,7 @@ export default function MyProductScreen() {
                             <ScrollView
                                 contentContainerStyle={styles.content}
                                 showsVerticalScrollIndicator={false}
+                                style={{ backgroundColor: colors.background }}
                             >
                                 {/* Mark as sold / available */}
                                 <Button
@@ -546,6 +547,7 @@ export default function MyProductScreen() {
                                 renderItem={({ item }) => (
                                     <SubscriberCard subscriber={item} />
                                 )}
+                                style={{ flex: 1, backgroundColor: colors.background }}
                                 contentContainerStyle={styles.subscriberList}
                                 ListEmptyComponent={
                                     <ThemedText

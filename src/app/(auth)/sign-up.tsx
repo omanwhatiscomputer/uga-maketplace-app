@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Button,
+    Checkbox,
     IconButton,
     Snackbar,
     Surface,
@@ -53,6 +54,7 @@ export default function SignUpScreen() {
 
     const [phone, setPhone] = useState("");
     const [rawPhone, setRawPhone] = useState("");
+    const [zelleConfirmed, setZelleConfirmed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -170,6 +172,19 @@ export default function SignUpScreen() {
                     keyboardType="phone-pad"
                     maxLength={14}
                 />
+                <Checkbox.Item
+                    label="I confirm that my mobile number is linked to an active Zelle account and can be used to send and receive payments."
+                    status={zelleConfirmed ? "checked" : "unchecked"}
+                    onPress={() => setZelleConfirmed((v) => !v)}
+                    labelStyle={{
+                        fontSize: 12,
+                        lineHeight: 16,
+                        textAlign: "left",
+                        color: primary,
+                        fontWeight: "bold",
+                    }}
+                    position="leading"
+                />
                 {loading ? (
                     <ActivityIndicator animating size="large" />
                 ) : (
@@ -178,7 +193,13 @@ export default function SignUpScreen() {
                         mode="contained"
                         onPress={handleCreateAccount}
                         disabled={
-                            !(email && fName && lName && rawPhone.length === 10)
+                            !(
+                                email &&
+                                fName &&
+                                lName &&
+                                rawPhone.length === 10 &&
+                                zelleConfirmed
+                            )
                         }
                     >
                         Create Account
