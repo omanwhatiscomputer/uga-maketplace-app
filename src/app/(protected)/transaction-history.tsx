@@ -1,5 +1,6 @@
 import {
     getSalesHistory,
+    getPurchaseHistory,
     type Transaction,
 } from "@/api/endpoints/transactions";
 import { ThemedText } from "@/components/themed-text";
@@ -14,51 +15,68 @@ import {
     Appbar,
     Avatar,
     Card,
+    Chip,
     Divider,
     Surface,
     Text,
 } from "react-native-paper";
 
-function TransactionCard({ record }: { record: Transaction }) {
+type TransactionEntry = Transaction & { kind: "sale" | "purchase" };
+
+function TransactionCard({ record }: { record: TransactionEntry }) {
     const { colors } = useAppTheme();
-    const { buyer } = record;
+    const { kind } = record;
+    const isSale = kind === "sale";
+    const counterpart = isSale ? record.buyer : record.seller;
+    const borderColor = isSale ? colors.outline : colors.error;
 
     return (
-        <Card style={styles.card}>
+        <Card style={[styles.card, { borderColor, borderWidth: 1.5 }]}>
             <Card.Content style={styles.cardContent}>
                 <Avatar.Text
                     size={44}
-                    label={`${buyer.firstName[0]}${buyer.lastName[0]}`}
-                    style={{ backgroundColor: colors.primary }}
-                    color={colors.onPrimary}
+                    label={`${counterpart.firstName[0]}${counterpart.lastName[0]}`}
+                    style={{
+                        backgroundColor: isSale ? colors.primary : colors.errorContainer,
+                    }}
+                    color={isSale ? colors.onPrimary : colors.onErrorContainer}
                 />
                 <Surface elevation={0} style={styles.info}>
-                    <Text
-                        variant="titleSmall"
-                        style={{ color: colors.onSurface }}
-                    >
-                        {buyer.firstName} {buyer.lastName}
-                    </Text>
-                    {buyer.mobileNumber ? (
-                        <Text
-                            variant="bodySmall"
-                            style={{ color: colors.onSurfaceVariant }}
+                    <Surface elevation={0} style={styles.row}>
+                        <Text variant="titleSmall" style={{ color: colors.onSurface, flex: 1 }}>
+                            {counterpart.firstName} {counterpart.lastName}
+                        </Text>
+                        <Chip
+                            compact
+                            style={{
+                                backgroundColor: isSale
+                                    ? colors.primaryContainer
+                                    : colors.errorContainer,
+                            }}
+                            textStyle={{
+                                fontSize: 10,
+                                color: isSale ? colors.onPrimaryContainer : colors.onErrorContainer,
+                            }}
                         >
-                            {buyer.mobileNumber}
+                            {isSale ? "Sold" : "Purchased"}
+                        </Chip>
+                    </Surface>
+                    {counterpart.mobileNumber ? (
+                        <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                            {counterpart.mobileNumber}
                         </Text>
                     ) : null}
-                    <Text
-                        variant="bodySmall"
-                        style={{ color: colors.onSurfaceVariant }}
-                    >
+                    <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
                         {record.productName}
                     </Text>
-                    <Text
-                        variant="titleSmall"
-                        style={{ color: colors.primary, marginTop: 2 }}
-                    >
-                        ${record.price.toFixed(2)}
-                    </Text>
+                    <Surface elevation={0} style={styles.row}>
+                        <Text variant="titleSmall" style={{ color: colors.primary }}>
+                            ${record.price.toFixed(2)}
+                        </Text>
+                        <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                            {new Date(record.date).toLocaleDateString()}
+                        </Text>
+                    </Surface>
                 </Surface>
             </Card.Content>
         </Card>
@@ -69,15 +87,24 @@ export default function TransactionHistoryScreen() {
     const { colors } = useAppTheme();
     const { user } = useAppContext();
 
-    const [records, setRecords] = useState<Transaction[]>([]);
+    const [records, setRecords] = useState<TransactionEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchTransactions = useCallback(async () => {
         if (!user) return;
         setLoading(true);
         try {
-            const data = await getSalesHistory();
-            setRecords(data);
+            const [sales, purchases] = await Promise.all([
+                getSalesHistory(),
+                getPurchaseHistory(),
+            ]);
+            const combined: TransactionEntry[] = [
+                ...sales.map((t) => ({ ...t, kind: "sale" as const })),
+                ...purchases.map((t) => ({ ...t, kind: "purchase" as const })),
+            ].sort(
+                (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+            );
+            setRecords(combined);
         } catch {
             // silently fail
         } finally {
@@ -90,41 +117,29 @@ export default function TransactionHistoryScreen() {
     return (
         <Surface style={styles.screen} elevation={0}>
             <Appbar.Header>
-                <Appbar.BackAction
-                    onPress={router.back}
-                    color={colors.primary}
-                />
+                <Appbar.BackAction onPress={router.back} color={colors.primary} />
                 <Appbar.Content title="Transaction History" />
             </Appbar.Header>
 
             <Divider />
 
             {loading ? (
-                <ActivityIndicator
-                    animating
-                    size="large"
-                    style={styles.loader}
-                />
+                <ActivityIndicator animating size="large" style={styles.loader} />
             ) : (
                 <FlatList
                     data={records}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => `${item.kind}-${item.id}`}
                     renderItem={({ item }) => <TransactionCard record={item} />}
+                    style={{ flex: 1 }}
                     ListHeaderComponent={
-                        <ThemedText
-                            variant={TextVariants.title_lg}
-                            style={styles.heading}
-                        >
+                        <ThemedText variant={TextVariants.title_lg} style={styles.heading}>
                             Transaction History
                         </ThemedText>
                     }
                     ListEmptyComponent={
                         <ThemedText
                             variant={TextVariants.body_md}
-                            style={[
-                                styles.empty,
-                                { color: colors.onSurfaceVariant },
-                            ]}
+                            style={[styles.empty, { color: colors.onSurfaceVariant }]}
                         >
                             No transactions yet.
                         </ThemedText>
@@ -145,7 +160,7 @@ const styles = StyleSheet.create({
     empty: { textAlign: "center", marginTop: 40 },
     card: {
         marginBottom: 12,
-        borderRadius: 0,
+        borderRadius: 8,
     },
     cardContent: {
         flexDirection: "row",
@@ -154,6 +169,12 @@ const styles = StyleSheet.create({
     },
     info: {
         flex: 1,
-        gap: 2,
+        gap: 4,
+    },
+    row: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
     },
 });

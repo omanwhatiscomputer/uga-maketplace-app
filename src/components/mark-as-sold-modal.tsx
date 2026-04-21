@@ -1,5 +1,5 @@
 import {
-    toggleAvailability,
+    sellProduct,
     type Product,
     type UserSummary,
 } from "@/api/endpoints/products";
@@ -25,7 +25,7 @@ type MarkAsSoldModalProps = {
     visible: boolean;
     product: Product;
     onClose: () => void;
-    onConfirm: (updated: Product) => void;
+    onConfirm: () => void;
 };
 
 export function MarkAsSoldModal({
@@ -78,7 +78,7 @@ export function MarkAsSoldModal({
         setLoading(true);
         setError(null);
         try {
-            const updated = await toggleAvailability(product.id);
+            await sellProduct(product.id, selected.id);
 
             if (selected.expoPushToken) {
                 await Notifications.scheduleNotificationAsync({
@@ -102,7 +102,7 @@ export function MarkAsSoldModal({
                 });
             }
 
-            onConfirm(updated);
+            onConfirm();
             onClose();
         } catch {
             setError("Failed to mark as sold.");

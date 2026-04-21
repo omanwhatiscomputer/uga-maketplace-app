@@ -293,6 +293,7 @@ export default function MyProductScreen() {
                                             variant={TextVariants.label_lg}
                                             style={{
                                                 color: colors.onSurfaceVariant,
+                                                fontWeight: "bold",
                                             }}
                                         >
                                             Description:
@@ -311,6 +312,7 @@ export default function MyProductScreen() {
                                         variant={TextVariants.label_lg}
                                         style={{
                                             color: colors.onSurfaceVariant,
+                                            fontWeight: "bold",
                                         }}
                                     >
                                         Price:
@@ -400,6 +402,7 @@ export default function MyProductScreen() {
                                         variant={TextVariants.label_lg}
                                         style={{
                                             color: colors.onSurfaceVariant,
+                                            fontWeight: "bold",
                                         }}
                                     >
                                         Condition:
@@ -415,6 +418,7 @@ export default function MyProductScreen() {
                                         variant={TextVariants.label_lg}
                                         style={{
                                             color: colors.onSurfaceVariant,
+                                            fontWeight: "bold",
                                         }}
                                     >
                                         Category:
@@ -434,6 +438,7 @@ export default function MyProductScreen() {
                                             variant={TextVariants.label_lg}
                                             style={{
                                                 color: colors.onSurfaceVariant,
+                                                fontWeight: "bold",
                                             }}
                                         >
                                             Email:
@@ -454,6 +459,7 @@ export default function MyProductScreen() {
                                             variant={TextVariants.label_lg}
                                             style={{
                                                 color: colors.onSurfaceVariant,
+                                                fontWeight: "bold",
                                             }}
                                         >
                                             Phone:
@@ -605,7 +611,7 @@ export default function MyProductScreen() {
                         visible={soldModalVisible}
                         product={product}
                         onClose={() => setSoldModalVisible(false)}
-                        onConfirm={(updated) => setProduct(updated)}
+                        onConfirm={() => router.back()}
                     />
                 </Portal>
             )}

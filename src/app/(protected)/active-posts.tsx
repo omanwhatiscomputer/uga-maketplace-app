@@ -60,7 +60,7 @@ export default function ActivePostsScreen() {
             else setLoading(true);
             try {
                 const data = await getAllProducts();
-                setProducts(data.filter((p) => p.sellerId === user.id));
+                setProducts(data.filter((p) => p.sellerId === user.id && p.isAvailable));
             } catch {
                 setError("Failed to load posts.");
             } finally {

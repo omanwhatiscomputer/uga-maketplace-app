@@ -237,7 +237,7 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.fieldBlock}>
                             <ThemedText
                                 variant={TextVariants.label_lg}
-                                style={{ color: colors.onSurfaceVariant }}
+                                style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                             >
                                 Description:
                             </ThemedText>
@@ -251,7 +251,7 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant }}
+                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                         >
                             Price:
                         </ThemedText>
@@ -354,7 +354,7 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant }}
+                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                         >
                             Condition:
                         </ThemedText>
@@ -367,7 +367,7 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant }}
+                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                         >
                             Category:
                         </ThemedText>
@@ -380,7 +380,7 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant }}
+                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                         >
                             Seller:
                         </ThemedText>
@@ -402,7 +402,7 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.inlineRow}>
                             <ThemedText
                                 variant={TextVariants.label_lg}
-                                style={{ color: colors.onSurfaceVariant }}
+                                style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                             >
                                 Email:
                             </ThemedText>
@@ -417,7 +417,7 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.inlineRow}>
                             <ThemedText
                                 variant={TextVariants.label_lg}
-                                style={{ color: colors.onSurfaceVariant }}
+                                style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
                             >
                                 Phone:
                             </ThemedText>

@@ -100,6 +100,10 @@ export async function toggleAvailability(id: string): Promise<Product> {
     return response.data;
 }
 
+export async function sellProduct(id: string, buyerId: string): Promise<void> {
+    await apiClient.post(`/product/${id}/sell`, { buyerId });
+}
+
 export async function deleteProduct(id: string): Promise<void> {
     await apiClient.delete(`/product/${id}`);
 }
