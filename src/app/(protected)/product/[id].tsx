@@ -155,7 +155,7 @@ export default function ProductDetailScreen() {
             );
             setProduct(updated);
         } catch {
-            // silently fail — location update failed
+            // silently fail :: location update failed
         }
     };
 
@@ -237,7 +237,10 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.fieldBlock}>
                             <ThemedText
                                 variant={TextVariants.label_lg}
-                                style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                                style={{
+                                    color: colors.onSurfaceVariant,
+                                    fontWeight: "bold",
+                                }}
                             >
                                 Description:
                             </ThemedText>
@@ -251,7 +254,10 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                            style={{
+                                color: colors.onSurfaceVariant,
+                                fontWeight: "bold",
+                            }}
                         >
                             Price:
                         </ThemedText>
@@ -314,7 +320,7 @@ export default function ProductDetailScreen() {
                         </Surface>
                     )}
 
-                    {/* Wishlist + Subscribe — buyers only */}
+                    {/* Wishlist + Subscribe :: buyers only */}
                     {!isSeller && (
                         <Surface elevation={0} style={styles.actionButtons}>
                             <Button
@@ -354,7 +360,10 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                            style={{
+                                color: colors.onSurfaceVariant,
+                                fontWeight: "bold",
+                            }}
                         >
                             Condition:
                         </ThemedText>
@@ -367,7 +376,10 @@ export default function ProductDetailScreen() {
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                            style={{
+                                color: colors.onSurfaceVariant,
+                                fontWeight: "bold",
+                            }}
                         >
                             Category:
                         </ThemedText>
@@ -376,11 +388,14 @@ export default function ProductDetailScreen() {
                         </ThemedText>
                     </Surface>
 
-                    {/* Seller name — clickable link */}
+                    {/* Seller name :: clickable link */}
                     <Surface elevation={0} style={styles.inlineRow}>
                         <ThemedText
                             variant={TextVariants.label_lg}
-                            style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                            style={{
+                                color: colors.onSurfaceVariant,
+                                fontWeight: "bold",
+                            }}
                         >
                             Seller:
                         </ThemedText>
@@ -402,7 +417,10 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.inlineRow}>
                             <ThemedText
                                 variant={TextVariants.label_lg}
-                                style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                                style={{
+                                    color: colors.onSurfaceVariant,
+                                    fontWeight: "bold",
+                                }}
                             >
                                 Email:
                             </ThemedText>
@@ -417,7 +435,10 @@ export default function ProductDetailScreen() {
                         <Surface elevation={0} style={styles.inlineRow}>
                             <ThemedText
                                 variant={TextVariants.label_lg}
-                                style={{ color: colors.onSurfaceVariant, fontWeight: "bold" }}
+                                style={{
+                                    color: colors.onSurfaceVariant,
+                                    fontWeight: "bold",
+                                }}
                             >
                                 Phone:
                             </ThemedText>

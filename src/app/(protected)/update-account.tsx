@@ -6,11 +6,11 @@ import { useState } from "react";
 import { StyleSheet } from "react-native";
 import {
     Appbar,
+    Button,
     Snackbar,
     Surface,
     Text,
     TextInput,
-    Button,
 } from "react-native-paper";
 
 export default function UpdateAccountScreen() {
@@ -20,7 +20,8 @@ export default function UpdateAccountScreen() {
     const formatRaw = (digits: string) => {
         if (digits.length > 6)
             return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-        if (digits.length > 3) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+        if (digits.length > 3)
+            return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
         if (digits.length > 0) return `(${digits}`;
         return "";
     };
@@ -57,38 +58,59 @@ export default function UpdateAccountScreen() {
     return (
         <Surface style={{ flex: 1 }} elevation={0}>
             <Appbar.Header>
-                <Appbar.BackAction onPress={router.back} color={colors.primary} />
+                <Appbar.BackAction
+                    onPress={router.back}
+                    color={colors.primary}
+                />
                 <Appbar.Content title="Update Account" />
             </Appbar.Header>
 
             <Surface style={styles.form} elevation={0}>
                 <Surface style={styles.readOnlyGroup} elevation={0}>
                     <Surface style={styles.field} elevation={0}>
-                        <Text variant="labelMedium" style={{ color: colors.onSurfaceVariant }}>
+                        <Text
+                            variant="labelMedium"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
                             Name
                         </Text>
-                        <Text variant="bodyLarge" style={{ color: colors.onSurface }}>
+                        <Text
+                            variant="bodyLarge"
+                            style={{ color: colors.onSurface }}
+                        >
                             {user?.firstName} {user?.lastName}
                         </Text>
                     </Surface>
 
                     <Surface style={styles.field} elevation={0}>
-                        <Text variant="labelMedium" style={{ color: colors.onSurfaceVariant }}>
+                        <Text
+                            variant="labelMedium"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
                             Email
                         </Text>
-                        <Text variant="bodyLarge" style={{ color: colors.onSurface }}>
+                        <Text
+                            variant="bodyLarge"
+                            style={{ color: colors.onSurface }}
+                        >
                             {user?.email}
                         </Text>
                     </Surface>
 
                     <Surface style={styles.field} elevation={0}>
-                        <Text variant="labelMedium" style={{ color: colors.onSurfaceVariant }}>
+                        <Text
+                            variant="labelMedium"
+                            style={{ color: colors.onSurfaceVariant }}
+                        >
                             Member since
                         </Text>
-                        <Text variant="bodyLarge" style={{ color: colors.onSurface }}>
+                        <Text
+                            variant="bodyLarge"
+                            style={{ color: colors.onSurface }}
+                        >
                             {user?.dateJoined
                                 ? new Date(user.dateJoined).toLocaleDateString()
-                                : "—"}
+                                : "-"}
                         </Text>
                     </Surface>
                 </Surface>
@@ -125,7 +147,9 @@ export default function UpdateAccountScreen() {
                     width: "90%",
                     alignSelf: "center",
                 }}
-                theme={{ colors: { inverseSurface: colors.onPrimaryContainer } }}
+                theme={{
+                    colors: { inverseSurface: colors.onPrimaryContainer },
+                }}
                 action={{
                     label: "✕",
                     onPress: () => setSuccess(false),
